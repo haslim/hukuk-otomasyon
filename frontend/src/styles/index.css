@@ -1,13 +1,33 @@
-﻿@tailwind base;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-light: #f6f6f8;
+  --bg-dark: #111621;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-light);
 }
 
 .input {
   border: 1px solid #cbd5f5;
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
 }

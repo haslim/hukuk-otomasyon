@@ -1,32 +1,63 @@
-﻿import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const links = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/clients', label: 'Müvekkiller' },
-  { to: '/cases', label: 'Dosyalar' },
-  { to: '/workflow', label: 'Workflow' },
-  { to: '/documents', label: 'Dokümanlar' },
-  { to: '/finance', label: 'Kasa' },
-  { to: '/notifications', label: 'Bildirimler' },
-  { to: '/search', label: 'Arama' },
+  { to: '/', label: 'Dashboard', icon: 'dashboard' },
+  { to: '/cases', label: 'Dosyalar', icon: 'folder' },
+  { to: '/clients', label: 'Müvekkiller', icon: 'group' },
+  { to: '/finance', label: 'Kasa', icon: 'account_balance_wallet' },
+  { to: '/documents', label: 'Dokümanlar', icon: 'folder_open' },
+  { to: '/notifications', label: 'Bildirimler', icon: 'notifications' },
+  { to: '/workflow', label: 'Workflow', icon: 'route' },
+  { to: '/search', label: 'Arama', icon: 'search' },
 ];
 
 export const Sidebar = () => (
-  <aside className="w-64 bg-slate-900 text-white p-4 space-y-4">
-    <h1 className="text-xl font-bold">BGAofis</h1>
-    <nav className="space-y-2">
+  <aside className="flex h-screen w-64 flex-col bg-[#2D3748] text-[#E2E8F0] p-4 sticky top-0">
+    <div className="flex items-center gap-3 px-3 py-4 mb-4">
+      <div className="size-8 text-[#2463eb]">
+        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor" />
+        </svg>
+      </div>
+      <h1 className="text-white text-xl font-bold">BGAofis</h1>
+    </div>
+    <nav className="flex flex-col gap-2">
       {links.map((link) => (
         <NavLink
           key={link.to}
           to={link.to}
           className={({ isActive }) =>
-            `block rounded px-3 py-2 text-sm ${isActive ? 'bg-white/20' : 'hover:bg-white/10'}`
+            `relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
+              isActive ? 'bg-[#2463eb]/20 text-white' : 'hover:bg-[#2463eb]/20 text-[#A0AEC0]'
+            }`
           }
           end={link.to === '/'}
         >
-          {link.label}
+          {({ isActive }) => (
+            <>
+              {isActive && <span className="absolute left-0 top-0 bottom-0 w-1 bg-[#2463eb] rounded-r-full" />}
+              <span className={`material-symbols-outlined ${isActive ? 'text-white' : 'text-[#A0AEC0]'}`}>
+                {link.icon}
+              </span>
+              <span className={isActive ? 'font-semibold text-white' : ''}>{link.label}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>
+    <div className="mt-auto flex items-center gap-3 p-3 rounded-lg bg-black/20">
+      <div
+        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+        style={{
+          backgroundImage:
+            'url("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80")',
+        }}
+      />
+      <div className="flex flex-col">
+        <h1 className="text-white text-sm font-semibold leading-tight">Can Yılmaz</h1>
+        <p className="text-[#A0AEC0] text-xs leading-tight">Avukat</p>
+      </div>
+      <span className="material-symbols-outlined ml-auto text-white">logout</span>
+    </div>
   </aside>
 );
