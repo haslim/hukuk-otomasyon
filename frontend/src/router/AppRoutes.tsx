@@ -1,0 +1,22 @@
+﻿import { Routes, Route } from 'react-router-dom';
+import { DashboardPage } from '../pages/Dashboard/DashboardPage';
+import { ClientsPage } from '../pages/Clients/ClientsPage';
+import { CasesPage } from '../pages/Cases/CasesPage';
+import { WorkflowPage } from '../pages/Workflow/WorkflowPage';
+import { DocumentsPage } from '../pages/Documents/DocumentsPage';
+import { FinancePage } from '../pages/Finance/FinancePage';
+import { NotificationsPage } from '../pages/Notifications/NotificationsPage';
+import { SearchPage } from '../pages/Search/SearchPage';
+
+export const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<DashboardPage />} />
+    <Route path="/clients" element={<ClientsPage />} />
+    <Route path="/cases" element={<CasesPage />} />
+    <Route path="/workflow" element={<WorkflowPage />} />
+    <Route path="/documents" element={<DocumentsPage />} />
+    <Route path="/finance" element={<FinancePage />} />
+    <Route path="/notifications" element={<NotificationsPage />} />
+    <Route path="/search" element={<SearchPage />} />
+  </Routes>
+);
