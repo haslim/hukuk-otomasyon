@@ -16,6 +16,12 @@ export const CaseDetailPage = () => {
   const responsible = caseData.metadata?.responsible ?? 'Atanmamış';
   const summary = caseData.subject ?? 'Henüz bir özet girilmemiş.';
 
+  const colorMap = {
+    blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    red: { bg: 'bg-red-100', text: 'text-red-600' },
+    slate: { bg: 'bg-slate-100', text: 'text-slate-600' },
+  };
+
   const parties = useMemo(() => {
     if (!caseData.parties?.length) {
       return [
@@ -103,7 +109,9 @@ export const CaseDetailPage = () => {
               {parties.map((party, idx) => (
                 <li key={party.name + idx} className="flex items-start gap-4">
                   <div
-                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-${party.color}-100 text-${party.color}-600 font-semibold`}
+                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
+                      colorMap[party.color as keyof typeof colorMap]?.bg ?? 'bg-slate-100'
+                    } ${colorMap[party.color as keyof typeof colorMap]?.text ?? 'text-slate-600'} font-semibold`}
                   >
                     {party.role[0]}
                   </div>
