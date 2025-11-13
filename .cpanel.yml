@@ -1,0 +1,58 @@
+---
+cPanel:
+  version: 1.0
+  description: "BGAofis Hukuk Bürosu Otomasyon Sistemi"
+  
+deployment:
+  type: "php"
+  
+  # PHP configuration
+  php:
+    version: "8.2"
+    extensions:
+      - "pdo_mysql"
+      - "json"
+      - "mbstring"
+      - "tokenizer"
+      - "xml"
+      - "curl"
+      - "zip"
+      - "fileinfo"
+    
+  # Document root
+  document_root: "backend/public"
+  
+  # Deployment hooks
+  hooks:
+    deploy:
+      - "cd backend && composer install --no-dev --optimize-autoloader"
+      - "cd backend && php database/migrate.php"
+      - "cd frontend && npm install"
+      - "cd frontend && npm run build"
+      - "cp -r frontend/dist/* backend/public/"
+    
+  # Directories that need to be writable
+  writable_directories:
+    - "backend/storage"
+    - "backend/storage/logs"
+    - "backend/storage/uploads"
+    - "backend/storage/cache"
+  
+  # Environment variables
+  environment:
+    APP_ENV: "production"
+    APP_DEBUG: "false"
+    
+  # Database configuration (will be set during deployment)
+  database:
+    type: "mysql"
+    
+  # Security settings
+  security:
+    # Disable directory listing
+    directory_listing: false
+    # Hide PHP errors in production
+    display_errors: false
+    # Set proper file permissions
+    file_permissions: "644"
+    directory_permissions: "755"

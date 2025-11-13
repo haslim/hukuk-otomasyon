@@ -2,6 +2,7 @@
 import { DashboardPage } from '../pages/Dashboard/DashboardPage';
 import { ClientsPage } from '../pages/Clients/ClientsPage';
 import { CasesPage } from '../pages/Cases/CasesPage';
+import { CaseDetailPage } from '../pages/Cases/CaseDetailPage';
 import { WorkflowPage } from '../pages/Workflow/WorkflowPage';
 import { DocumentsPage } from '../pages/Documents/DocumentsPage';
 import { FinancePage } from '../pages/Finance/FinancePage';
@@ -13,6 +14,7 @@ export const AppRoutes = () => (
     <Route path="/" element={<DashboardPage />} />
     <Route path="/clients" element={<ClientsPage />} />
     <Route path="/cases" element={<CasesPage />} />
+    <Route path="/cases/:id" element={<CaseDetailPage />} />
     <Route path="/workflow" element={<WorkflowPage />} />
     <Route path="/documents" element={<DocumentsPage />} />
     <Route path="/finance" element={<FinancePage />} />

@@ -19,7 +19,8 @@ interface Props {
 
 export const AppLayout = ({ children }: Props) => {
   const location = useLocation();
-  const pageTitle = titles[location.pathname] ?? 'BGAofis';
+  const dynamicTitle = location.pathname.startsWith('/cases/') ? 'Dosya Detayı' : undefined;
+  const pageTitle = dynamicTitle ?? titles[location.pathname] ?? 'BGAofis';
 
   return (
     <div className="relative flex min-h-screen w-full bg-[#F6F6F8] text-[#1A202C]">
