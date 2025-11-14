@@ -6,7 +6,7 @@ use App\Models\User;
 
 class AdminUserSeeder
 {
-    private const NAME = 'Ali Haydar AslÄ±m';
+    private const NAME = 'Ali Haydar Aslim';
     private const EMAIL = 'alihaydraslim@gmail.com';
     private const PASSWORD = 'test123456';
 
@@ -14,28 +14,22 @@ class AdminUserSeeder
     {
         $hashedPassword = password_hash(self::PASSWORD, PASSWORD_BCRYPT);
 
-        $user = User::withTrashed()->where('email', self::EMAIL)->first();
-
-        if (!$user) {
-            User::create([
-                'name' => self::NAME,
-                'email' => self::EMAIL,
-                'password' => $hashedPassword,
-                'phone' => null,
-            ]);
-
-            echo "Admin kullanÄ±cÄ±sÄ± oluÅŸturuldu: " . self::EMAIL . PHP_EOL;
-            return;
-        }
-
-        if ($user->trashed()) {
-            $user->restore();
-        }
+        $user = User::withTrashed()->firstOrNew(['email' => self::EMAIL]);
 
         $user->name = self::NAME;
         $user->password = $hashedPassword;
+        if (!isset($user->phone)) {
+            $user->phone = null;
+        }
+
+        // ensure not soft-deleted
+        if (isset($user->deleted_at)) {
+            $user->deleted_at = null;
+        }
+
         $user->save();
 
-        echo "Admin kullanÄ±cÄ±sÄ± gÃ¼ncellendi: " . self::EMAIL . PHP_EOL;
+        echo 'Admin user seeded: ' . self::EMAIL . PHP_EOL;
     }
 }
+
