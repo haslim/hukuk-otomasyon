@@ -100,8 +100,8 @@ jobs:
         
     - name: Create .htaccess for frontend
       run: |
-        chmod +x ../scripts/create-htaccess.sh
-        ../scripts/create-htaccess.sh
+        chmod +x ./scripts/create-htaccess.sh
+        ./scripts/create-htaccess.sh
         
     - name: Deploy Frontend to name.com
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
