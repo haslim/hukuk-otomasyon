@@ -90,7 +90,7 @@ jobs:
         cd frontend
         if [ ! -f .env ]; then
           cp .env.example .env
-          echo "VITE_API_BASE_URL=${{ secrets.FRONTEND_API_URL }}" >> .env
+          echo "VITE_API_URL=${{ secrets.FRONTEND_API_URL }}" >> .env
         fi
         
     - name: Build frontend
