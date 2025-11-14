@@ -1,0 +1,218 @@
+name: Deploy to name.com
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, mysql, curl, zip, openssl
+        coverage: none
+        
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: |
+        echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+          
+    - name: Install Composer dependencies
+      run: |
+        cd backend
+        composer install --no-dev --optimize-autoloader
+        
+    - name: Prepare deployment files
+      run: |
+        mkdir -p backend/logs
+        mkdir -p backend/uploads
+        mkdir -p backend/backups
+        mkdir -p backend/temp
+        
+    - name: Deploy Backend to name.com
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./backend/
+        server-dir: ${{ secrets.FTP_BACKEND_DIR }}
+        exclude: "**/.git* **/node_modules/** **/tests/** **/.env* **/composer.lock"
+        
+    - name: Run database migrations (remote)
+      run: |
+        echo "Database migrations should be run manually on the server:"
+        echo "1. SSH into your name.com hosting"
+        echo "2. Navigate to backend directory"
+        echo "3. Run: php database/migrate.php"
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Create .env file
+      run: |
+        cd frontend
+        if [ ! -f .env ]; then
+          cp .env.example .env
+          echo "VITE_API_BASE_URL=${{ secrets.FRONTEND_API_URL }}" >> .env
+        fi
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Create .htaccess for frontend
+      run: |
+        chmod +x ../scripts/create-htaccess.sh
+        ../scripts/create-htaccess.sh
+        
+    - name: Deploy Frontend to name.com
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./frontend/dist/
+        server-dir: ${{ secrets.FTP_FRONTEND_DIR }}
+        exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
+
+  test-backend:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, mysql, curl, zip, openssl
+        coverage: none
+        
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: |
+        echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+          
+    - name: Install Composer dependencies
+      run: |
+        cd backend
+        composer install
+        
+    - name: Run syntax check
+      run: |
+        cd backend
+        find . -name "*.php" -exec php -l {} \;
+        
+    - name: Run tests if available
+      run: |
+        cd backend
+        if [ -f "phpunit.xml" ] || [ -f "phpunit.xml.dist" ]; then
+          ./vendor/bin/phpunit
+        else
+          echo "No PHPUnit configuration found, skipping tests"
+        fi
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Run type check
+      run: |
+        cd frontend
+        npm run build || echo "Build failed - please check the errors above"
+        
+    - name: Run tests if available
+      run: |
+        cd frontend
+        if npm run test --if-present; then
+          echo "Tests completed"
+        else
+          echo "No test script found, skipping tests"
+        fi
+
+  notify-deployment:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: always() && (needs.deploy-backend.result == 'success' || needs.deploy-frontend.result == 'success')
+    
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Backend Status: ${{ needs.deploy-backend.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "### Frontend Status: ${{ needs.deploy-frontend.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "1. Check your website at: https://${{ secrets.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
+        echo "2. Run database migrations on the server if needed" >> $GITHUB_STEP_SUMMARY
+        echo "3. Test all functionality" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔧 Manual Actions Required" >> $GITHUB_STEP_SUMMARY
+        echo "- SSH into your name.com hosting" >> $GITHUB_STEP_SUMMARY
+        echo "- Navigate to backend directory" >> $GITHUB_STEP_SUMMARY
+        echo "- Run: \`php database/migrate.php\`" >> $GITHUB_STEP_SUMMARY

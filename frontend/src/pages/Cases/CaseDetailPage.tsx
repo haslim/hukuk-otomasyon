@@ -5,7 +5,7 @@ import { useAsyncData } from '../../hooks/useAsyncData';
 
 export const CaseDetailPage = () => {
   const { id = '' } = useParams();
-  const { data, isLoading } = useAsyncData(['case', id], () => CaseApi.show(id), { enabled: Boolean(id) });
+  const { data, isLoading } = useAsyncData(['case', id], () => CaseApi.show(id), { queryKey: ['case', id], enabled: Boolean(id) });
 
   const caseData = data ?? {};
   const clientName = caseData.client?.name ?? 'Müvekkil Belirtilmedi';
@@ -106,7 +106,7 @@ export const CaseDetailPage = () => {
           <section className="rounded-xl border border-slate-200 bg-white p-6">
             <h3 className="text-lg font-semibold text-[#1A202C]">Taraflar</h3>
             <ul className="mt-4 space-y-4">
-              {parties.map((party, idx) => (
+              {parties.map((party: any, idx: number) => (
                 <li key={party.name + idx} className="flex items-start gap-4">
                   <div
                     className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${

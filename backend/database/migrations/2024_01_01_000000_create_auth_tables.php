@@ -1,12 +1,17 @@
 ﻿<?php
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-return new class {
-    public function up()
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        Capsule::schema()->create('users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
@@ -16,7 +21,7 @@ return new class {
             $table->softDeletes();
         });
 
-        Capsule::schema()->create('roles', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('key')->unique();
@@ -24,7 +29,7 @@ return new class {
             $table->softDeletes();
         });
 
-        Capsule::schema()->create('permissions', function (Blueprint $table) {
+        Schema::create('permissions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('key')->unique();
@@ -32,23 +37,26 @@ return new class {
             $table->softDeletes();
         });
 
-        Capsule::schema()->create('user_roles', function (Blueprint $table) {
+        Schema::create('user_roles', function (Blueprint $table) {
             $table->uuid('user_id');
             $table->uuid('role_id');
         });
 
-        Capsule::schema()->create('role_permissions', function (Blueprint $table) {
+        Schema::create('role_permissions', function (Blueprint $table) {
             $table->uuid('role_id');
             $table->uuid('permission_id');
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        Capsule::schema()->dropIfExists('role_permissions');
-        Capsule::schema()->dropIfExists('user_roles');
-        Capsule::schema()->dropIfExists('permissions');
-        Capsule::schema()->dropIfExists('roles');
-        Capsule::schema()->dropIfExists('users');
+        Schema::dropIfExists('role_permissions');
+        Schema::dropIfExists('user_roles');
+        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('roles');
+        Schema::dropIfExists('users');
     }
 };

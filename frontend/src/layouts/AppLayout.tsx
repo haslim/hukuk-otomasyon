@@ -11,6 +11,8 @@ const titles: Record<string, string> = {
   '/finance': 'Kasa',
   '/notifications': 'Bildirimler',
   '/search': 'Gelişmiş Arama',
+  '/users': 'Kullanıcı Yönetimi',
+  '/users/roles': 'Roller & Yetkiler',
 };
 
 interface Props {

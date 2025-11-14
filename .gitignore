@@ -1,12 +1,40 @@
-﻿/backend/vendor/
-/backend/.env
-/backend/.env.*
-/backend/storage/
-/frontend/node_modules/
-/frontend/dist/
-/frontend/.env
-/frontend/.env.*
+﻿# Environment files
 .env
 .env.*
 !.env.example
+
+# Backend dependencies and storage
+/backend/vendor/
+/backend/storage/
+/backend/logs/
+/backend/uploads/
+/backups/
+/backend/backups/
+/backend/temp/
+
+# Frontend dependencies and build files
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+
+# IDE and OS files
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Deployment and temporary files
+*.log
+.php_cs.cache
+.php_cs
+.phpunit.result.cache
+
+# Git deployment state files
+.ftp-deploy-sync-state.json
+deploy-state.json
+
+# CI/CD
+.github/workflows/temp/

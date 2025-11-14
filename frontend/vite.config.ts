@@ -8,5 +8,27 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          query: ['@tanstack/react-query'],
+          utils: ['axios', 'zustand']
+        }
+      }
+    },
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      }
+    }
   },
+  base: '/',
+  preview: {
+    port: 4173,
+  }
 });
