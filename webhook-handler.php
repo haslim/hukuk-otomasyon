@@ -45,7 +45,7 @@ try {
     $payload = file_get_contents('php://input');
     
     // Get secret from environment or config
-    $secret = $_ENV['WEBHOOK_SECRET'] ?? 'your-default-secret-key';
+    $secret = $_ENV['WEBHOOK_SECRET'] ?? 'bgaofis-webhook-secret-2024';
     
     // Verify the signature
     if (!verifySignature($payload, $signature, $secret)) {
@@ -85,7 +85,7 @@ try {
     logMessage('Starting deployment process...');
     
     // Change to project directory
-    $projectDir = __DIR__ . '/..';
+    $projectDir = __DIR__;
     chdir($projectDir);
     
     // Pull latest changes
