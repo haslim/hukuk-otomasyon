@@ -7,7 +7,7 @@ interface Props {
 }
 
 export const LoginGate = ({ children }: Props) => {
-  const { token, setToken } = useAuth();
+  const { token, setToken, setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
@@ -21,6 +21,13 @@ export const LoginGate = ({ children }: Props) => {
     try {
       const { data } = await apiClient.post('/auth/login', { email, password, remember });
       setToken(data.token);
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+        });
+      }
     } catch (err: any) {
       const message = err?.response?.data?.message ?? 'Girdiğiniz e-posta veya şifre hatalı. Lütfen kontrol ediniz.';
       setError(message);
@@ -91,7 +98,7 @@ export const LoginGate = ({ children }: Props) => {
                       checked={remember}
                       onChange={(e) => setRemember(e.target.checked)}
                     />
-                    Beni Hatırla
+                    Beni hatırla
                   </label>
                   <a className="font-medium text-[#2463eb] hover:underline" href="#">
                     Şifremi unuttum?
@@ -114,3 +121,4 @@ export const LoginGate = ({ children }: Props) => {
 
   return <>{children}</>;
 };
+

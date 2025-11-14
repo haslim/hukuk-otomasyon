@@ -1,6 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 const titles: Record<string, string> = {
   '/': 'Dashboard',
@@ -13,8 +14,8 @@ const titles: Record<string, string> = {
   '/search': 'Gelişmiş Arama',
   '/users': 'Kullanıcı Yönetimi',
   '/users/roles': 'Roller & Yetkiler',
-  '/mediation': 'Arabuluculuk Ba�vurular�',
-  '/mediation/new': 'Yeni Arabuluculuk Ba�vurusu',
+  '/mediation': 'Arabuluculuk Başvuruları',
+  '/mediation/new': 'Yeni Arabuluculuk Başvurusu',
 };
 
 interface Props {
@@ -23,7 +24,15 @@ interface Props {
 
 export const AppLayout = ({ children }: Props) => {
   const location = useLocation();
-  const dynamicTitle = location.pathname.startsWith('/cases/') ? 'Dosya Detayı' : location.pathname.startsWith('/mediation/') && location.pathname !== '/mediation' && location.pathname !== '/mediation/new' ? 'Arabuluculuk Detayı' : undefined;
+  const { user, logout } = useAuth();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const dynamicTitle = location.pathname.startsWith('/cases/')
+    ? 'Dosya Detayı'
+    : location.pathname.startsWith('/mediation/') &&
+      location.pathname !== '/mediation' &&
+      location.pathname !== '/mediation/new'
+      ? 'Arabuluculuk Detayı'
+      : undefined;
   const pageTitle = dynamicTitle ?? titles[location.pathname] ?? 'BGAofis';
 
   return (
@@ -51,21 +60,37 @@ export const AppLayout = ({ children }: Props) => {
                 3
               </span>
             </button>
-            <div className="flex items-center gap-3">
-              <div
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                style={{
-                  backgroundImage:
-                    'url("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80")',
-                }}
-              />
-              <div className="flex flex-col text-right">
-                <span className="text-sm font-semibold">Can Yılmaz</span>
-                <span className="text-xs text-[#A0AEC0]">Avukat</span>
-              </div>
-              <button className="text-[#A0AEC0]">
-                <span className="material-symbols-outlined">expand_more</span>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setProfileOpen((prev) => !prev)}
+                className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-gray-100"
+              >
+                <div
+                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                  style={{
+                    backgroundImage:
+                      'url("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80")',
+                  }}
+                />
+                <div className="flex flex-col text-right">
+                  <span className="text-sm font-semibold">{user?.name ?? 'Can Yılmaz'}</span>
+                  <span className="text-xs text-[#A0AEC0]">{user?.title ?? 'Avukat'}</span>
+                </div>
+                <span className="material-symbols-outlined text-[#A0AEC0]">expand_more</span>
               </button>
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-40 rounded-lg border border-[#E2E8F0] bg-white shadow-md z-20">
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#1A202C] hover:bg-gray-50"
+                  >
+                    <span className="material-symbols-outlined text-base">logout</span>
+                    Çıkış Yap
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -73,5 +98,5 @@ export const AppLayout = ({ children }: Props) => {
       </main>
     </div>
   );
-};
+}
 
