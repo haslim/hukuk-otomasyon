@@ -2,7 +2,7 @@
 /**
  * Web-based Database Migration Runner
  * Use this only if you don't have terminal/SSH access to your hosting
- * 
+ *
  * SECURITY: This file should be removed after successful migration
  */
 
@@ -25,11 +25,11 @@ try {
     // Load environment
     $basePath = dirname(__DIR__);
     require_once $basePath . '/vendor/autoload.php';
-    
+
     if (file_exists($basePath . '/.env')) {
         Dotenv\Dotenv::createImmutable($basePath)->safeLoad();
     }
-    
+
     // Initialize database
     $capsule = new Illuminate\Database\Capsule\Manager();
     $capsule->addConnection([
@@ -44,35 +44,35 @@ try {
     ]);
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
-    
+
     echo "Database connection established successfully.\n";
     echo "Database: " . $_ENV['DB_DATABASE'] . "\n";
     echo "Host: " . $_ENV['DB_HOST'] . "\n\n";
-    
+
     // Run migrations
     $migrationsPath = $basePath . '/database/migrations';
     $files = glob($migrationsPath . '/*.php');
     sort($files);
-    
+
     echo "Running migrations:\n";
     echo "------------------\n";
-    
+
     foreach ($files as $file) {
         $migration = require $file;
         if (is_object($migration) && method_exists($migration, 'up')) {
             echo "Running: " . basename($file) . "... ";
             $migration->up();
-            echo "âœ“ Done\n";
+            echo "Done\n";
         }
     }
-    
+
     echo "\nMigration completed successfully!\n";
-    
+
     // Optional: Run seeders
     if (isset($_GET['seed']) && $_GET['seed'] === 'true') {
         echo "\nRunning seeders:\n";
         echo "----------------\n";
-        
+
         $seederPath = $basePath . '/database/seed.php';
         if (file_exists($seederPath)) {
             require $seederPath;
@@ -81,10 +81,11 @@ try {
             echo "No seeders found.\n";
         }
     }
-    
+
     echo "\nIMPORTANT: Delete this file (migrate.php) for security!\n";
-    
+
 } catch (Exception $e) {
     echo "\nERROR: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
 }
+
