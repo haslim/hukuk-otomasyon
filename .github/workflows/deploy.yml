@@ -51,7 +51,7 @@ jobs:
     - name: Deploy Backend to name.com
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ${{ secrets.FTP_SERVER }}
+        server: ftp.sistemyapielemanlari.com
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./backend/
@@ -110,7 +110,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./frontend/dist/
-        server-dir: /public_html/bgaofis.billurguleraslim.av.tr/
+        server-dir: /public_html/bgaofis.billurguleraslim.av.tr/frontend/
         exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
 
   test-backend:
@@ -208,7 +208,7 @@ jobs:
         echo "### Frontend Status: ${{ needs.deploy-frontend.result }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
-        echo "1. Check your website at: https://${{ secrets.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
+        echo "1. Check your website at: https://bgaofis.billurguleraslim.av.tr" >> $GITHUB_STEP_SUMMARY
         echo "2. Run database migrations on the server if needed" >> $GITHUB_STEP_SUMMARY
         echo "3. Test all functionality" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY

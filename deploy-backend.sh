@@ -9,8 +9,8 @@ echo "🚀 BGAofis Backend Deployment Started"
 echo "======================================"
 
 # Configuration
-SERVER=${FTP_SERVER:-"ftp.bgaofis.billurguleraslim.av.tr"}
-USERNAME=${FTP_USERNAME:-"haslim@bgaofis.billurguleraslim.av.tr"}
+SERVER=${FTP_SERVER:-"ftp.sistemyapielemanlari.com"}
+USERNAME=${FTP_USERNAME:-"haslim@sistemyapielemanlari.com"}
 PASSWORD=${FTP_PASSWORD:-"Fener1907****"}
 SERVER_DIR=${SERVER_DIR:-"/public_html/bgaofis.billurguleraslim.av.tr/backend/"}
 LOCAL_DIR="./backend/"
