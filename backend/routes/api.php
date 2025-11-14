@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Controllers\AuthController;
 use App\Controllers\CaseController;

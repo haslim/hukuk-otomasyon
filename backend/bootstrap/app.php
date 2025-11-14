@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
