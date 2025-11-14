@@ -29,7 +29,8 @@ export const LoginGate = ({ children }: Props) => {
         });
       }
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? 'GirdiÄŸiniz e-posta veya ÅŸifre hatalÄ±. LÃ¼tfen kontrol ediniz.';
+      const message =
+        err?.response?.data?.message ?? 'Girdiğiniz e-posta veya şifre hatalı. Lütfen kontrol ediniz.';
       setError(message);
     } finally {
       setLoading(false);
@@ -47,14 +48,14 @@ export const LoginGate = ({ children }: Props) => {
                 <span className="text-3xl font-bold text-gray-900">BGAofis</span>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 leading-tight">
-                Hukuk YÃ¶netiminde Dijital Ã‡Ã¶zÃ¼mÃ¼nÃ¼z
+                Hukuk Yönetiminde Dijital Çözümünüz
               </h1>
               <p className="text-base text-gray-600">
-                MÃ¼vekkil yÃ¶netimi, dava takibi ve dokÃ¼man arÅŸivleme gibi tÃ¼m sÃ¼reÃ§lerinizi tek bir platformdan yÃ¶netin.
+                Müvekkil yönetimi, dava takibi ve doküman arşivleme gibi tüm süreçlerinizi tek bir platformdan yönetin.
               </p>
             </div>
             <div className="mx-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
-              <h2 className="mb-6 text-2xl font-bold text-gray-900">Sisteme GiriÅŸ</h2>
+              <h2 className="mb-6 text-2xl font-bold text-gray-900">Sisteme Giriş</h2>
               {error && (
                 <div className="mb-6 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   <span className="material-symbols-outlined text-xl">error</span>
@@ -77,12 +78,12 @@ export const LoginGate = ({ children }: Props) => {
                   </div>
                 </label>
                 <label className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-gray-700">Åifre</span>
+                  <span className="text-sm font-medium text-gray-700">Şifre</span>
                   <div className="flex items-center rounded-lg border border-gray-300 bg-[#f6f6f8]">
                     <span className="material-symbols-outlined px-3 text-gray-500">lock</span>
                     <input
                       className="h-12 flex-1 rounded-r-lg bg-transparent px-3 text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2463eb]"
-                      placeholder="Åifrenizi giriniz"
+                      placeholder="Şifrenizi giriniz"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -98,10 +99,10 @@ export const LoginGate = ({ children }: Props) => {
                       checked={remember}
                       onChange={(e) => setRemember(e.target.checked)}
                     />
-                    Beni hatÄ±rla
+                    Beni hatırla
                   </label>
                   <a className="font-medium text-[#2463eb] hover:underline" href="#">
-                    Åifremi unuttum?
+                    Şifremi unuttum?
                   </a>
                 </div>
                 <button
@@ -109,7 +110,7 @@ export const LoginGate = ({ children }: Props) => {
                   disabled={loading}
                   className="flex w-full items-center justify-center rounded-lg bg-[#2463eb] py-3 text-base font-semibold text-white transition hover:bg-[#1d4fd8] disabled:opacity-60"
                 >
-                  {loading ? 'GiriÅŸ yapÄ±lÄ±yor...' : 'GiriÅŸ Yap'}
+                  {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
                 </button>
               </form>
             </div>

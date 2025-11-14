@@ -10,7 +10,7 @@ abstract class Controller
     {
         $response->getBody()->write(json_encode($data));
         return $response
-            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Content-Type', 'application/json; charset=utf-8')
             ->withStatus($status);
     }
 }

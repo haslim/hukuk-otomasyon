@@ -6,12 +6,12 @@ const links = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
   { to: '/cases', label: 'Dosyalar', icon: 'folder' },
   { to: '/mediation', label: 'Arabuluculuk', icon: 'handshake' },
-  { to: '/clients', label: 'MǬvekkiller', icon: 'group' },
+  { to: '/clients', label: 'Müvekkiller', icon: 'group' },
   { to: '/finance/cash', label: 'Kasa', icon: 'account_balance_wallet' },
   { to: '/calendar', label: 'Takvim', icon: 'calendar_month' },
-  { to: '/users', label: 'Kullan��c��lar', icon: 'manage_accounts' },
+  { to: '/users', label: 'Kullanıcılar', icon: 'manage_accounts' },
   { to: '/users/roles', label: 'Roller & Yetkiler', icon: 'admin_panel_settings' },
-  { to: '/documents', label: 'DokǬmanlar', icon: 'folder_open' },
+  { to: '/documents', label: 'Dokümanlar', icon: 'folder_open' },
   { to: '/notifications', label: 'Bildirimler', icon: 'notifications' },
   { to: '/workflow', label: 'Workflow', icon: 'route' },
   { to: '/search', label: 'Arama', icon: 'search' },
@@ -78,7 +78,7 @@ export const Sidebar = () => {
           }}
         />
         <div className="flex flex-col">
-          <h1 className="text-white text-sm font-semibold leading-tight">Can Y��lmaz</h1>
+          <h1 className="text-white text-sm font-semibold leading-tight">Can Yılmaz</h1>
           <p className="text-[#A0AEC0] text-xs leading-tight">Avukat</p>
         </div>
         <span className="material-symbols-outlined ml-auto text-white">logout</span>
