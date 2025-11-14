@@ -13,6 +13,8 @@ const titles: Record<string, string> = {
   '/search': 'Gelişmiş Arama',
   '/users': 'Kullanıcı Yönetimi',
   '/users/roles': 'Roller & Yetkiler',
+  '/mediation': 'Arabuluculuk Ba�vurular�',
+  '/mediation/new': 'Yeni Arabuluculuk Ba�vurusu',
 };
 
 interface Props {
@@ -21,7 +23,7 @@ interface Props {
 
 export const AppLayout = ({ children }: Props) => {
   const location = useLocation();
-  const dynamicTitle = location.pathname.startsWith('/cases/') ? 'Dosya Detayı' : undefined;
+  const dynamicTitle = location.pathname.startsWith('/cases/') ? 'Dosya Detayı' : location.pathname.startsWith('/mediation/') && location.pathname !== '/mediation' && location.pathname !== '/mediation/new' ? 'Arabuluculuk Detayı' : undefined;
   const pageTitle = dynamicTitle ?? titles[location.pathname] ?? 'BGAofis';
 
   return (
@@ -72,3 +74,4 @@ export const AppLayout = ({ children }: Props) => {
     </div>
   );
 };
+

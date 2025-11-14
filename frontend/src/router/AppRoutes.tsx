@@ -12,6 +12,9 @@ import { UserManagementPage } from '../pages/Users/UserManagementPage';
 import { RoleManagementPage } from '../pages/Users/RoleManagementPage';
 import { NotificationsPage } from '../pages/Notifications/NotificationsPage';
 import { SearchPage } from '../pages/Search/SearchPage';
+import { MediationListPage } from '../pages/mediation/MediationListPage';
+import { MediationDetailPage } from '../pages/mediation/MediationDetailPage';
+import { MediationNewPage } from '../pages/mediation/MediationNewPage';
 
 export const AppRoutes = () => (
   <Routes>
@@ -28,5 +31,8 @@ export const AppRoutes = () => (
     <Route path="/users/roles" element={<RoleManagementPage />} />
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route path="/search" element={<SearchPage />} />
+    <Route path="/mediation" element={<MediationListPage />} />
+    <Route path="/mediation/new" element={<MediationNewPage />} />
+    <Route path="/mediation/:id" element={<MediationDetailPage />} />
   </Routes>
 );

@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 const links = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
   { to: '/cases', label: 'Dosyalar', icon: 'folder' },
+  { to: '/mediation', label: 'Arabuluculuk', icon: 'handshake' },
   { to: '/clients', label: 'Müvekkiller', icon: 'group' },
   { to: '/finance/cash', label: 'Kasa', icon: 'account_balance_wallet' },
   { to: '/calendar', label: 'Takvim', icon: 'calendar_month' },
