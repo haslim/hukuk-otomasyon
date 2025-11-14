@@ -1,58 +1,117 @@
----
-cPanel:
-  version: 1.0
-  description: "BGAofis Hukuk Bürosu Otomasyon Sistemi"
-  
+# BGAofis Hukuk Otomasyon - cPanel Deployment Configuration
+# This file configures automatic deployment for cPanel hosting
+
 deployment:
-  type: "php"
-  
-  # PHP configuration
-  php:
-    version: "8.2"
-    extensions:
-      - "pdo_mysql"
-      - "json"
-      - "mbstring"
-      - "tokenizer"
-      - "xml"
-      - "curl"
-      - "zip"
-      - "fileinfo"
-    
-  # Document root
-  document_root: "backend/public"
-  
-  # Deployment hooks
-  hooks:
-    deploy:
-      - "cd backend && composer install --no-dev --optimize-autoloader"
-      - "cd backend && php database/migrate.php"
-      - "cd frontend && npm install"
-      - "cd frontend && npm run build"
-      - "cp -r frontend/dist/* backend/public/"
-    
-  # Directories that need to be writable
-  writable_directories:
-    - "backend/storage"
-    - "backend/storage/logs"
-    - "backend/storage/uploads"
-    - "backend/storage/cache"
-  
-  # Environment variables
-  environment:
-    APP_ENV: "production"
-    APP_DEBUG: "false"
-    
-  # Database configuration (will be set during deployment)
-  database:
-    type: "mysql"
-    
-  # Security settings
-  security:
-    # Disable directory listing
-    directory_listing: false
-    # Hide PHP errors in production
-    display_errors: false
-    # Set proper file permissions
-    file_permissions: "644"
-    directory_permissions: "755"
+  production:
+    repository_url: https://github.com/haslim/hukuk-otomasyon.git
+    branch: main
+    deployment_path: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr
+    exclude_paths:
+      - .git
+      - .gitignore
+      - node_modules
+      - vendor
+      - .env
+      - *.log
+      - .DS_Store
+      - Thumbs.db
+    include_paths:
+      - backend/
+      - frontend/dist/
+    post_deployment_commands:
+      - cd /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend
+      - php database/migrate.php
+      - chmod -R 755 uploads/
+      - chmod -R 755 logs/
+      - chmod -R 755 backups/
+      - chmod -R 755 temp/
+
+# Application settings
+application:
+  name: "BGAofis Hukuk Otomasyon"
+  type: "php_fullstack"
+  php_version: "8.2"
+  database_type: "mysql"
+  ssl_required: true
+  memory_limit: "256M"
+  max_execution_time: "300"
+
+# Development settings
+development:
+  enabled: false
+  debug_mode: false
+  error_reporting: "E_ERROR | E_WARNING | E_PARSE"
+  display_errors: false
+
+# Security settings
+security:
+  enable_hotlink_protection: true
+  enable_leech_protection: true
+  block_suspicious_requests: true
+  enable_mod_security: true
+  ip_whitelist: []
+  ip_blacklist: []
+
+# Performance settings
+performance:
+  enable_opcache: true
+  opcache_memory_consumption: "128"
+  opcache_max_accelerated_files: "4000"
+  enable_gzip_compression: true
+  enable_browser_caching: true
+  cache_expiration: "1 month"
+
+# Backup settings
+backup:
+  enabled: true
+  frequency: "daily"
+  retention_days: 30
+  backup_directories:
+    - /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend/uploads
+    - /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend/backups
+  backup_database: true
+  database_name: "haslim_bgofis"
+
+# SSL settings
+ssl:
+  enabled: true
+  force_https: true
+  ssl_certificate_path: "/etc/ssl/certs/bgaofis.billurguleraslim.av.tr.crt"
+  ssl_certificate_key_path: "/etc/ssl/private/bgaofis.billurguleraslim.av.tr.key"
+  auto_renewal: true
+
+# Email settings
+email:
+  enabled: true
+  smtp_host: "localhost"
+  smtp_port: "587"
+  smtp_username: "noreply@bgaofis.billurguleraslim.av.tr"
+  smtp_password: "your-smtp-password"
+  smtp_encryption: "tls"
+  from_address: "noreply@bgaofis.billurguleraslim.av.tr"
+  from_name: "BGAofis Hukuk Otomasyon"
+
+# Monitoring settings
+monitoring:
+  enabled: true
+  error_log_path: "/home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend/logs/error.log"
+  access_log_path: "/home/haslim/public_html/bgaofis.billurguleraslim.av.tr/logs/access.log"
+  disk_usage_alert: true
+  disk_usage_threshold: "80%"
+  memory_usage_alert: true
+  memory_usage_threshold: "85%"
+
+# Cron jobs
+cron_jobs:
+  - name: "Database Backup"
+    command: "cd /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend && php database/backup.php"
+    schedule: "0 2 * * *"
+    enabled: true
+  - name: "Log Cleanup"
+    command: "find /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend/logs -name '*.log' -mtime +30 -delete"
+    schedule: "0 3 * * 0"
+    enabled: true
+  - name: "Cache Cleanup"
+    command: "find /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend/temp -name '*' -mtime +7 -delete"
+    schedule: "0 4 * * *"
+    enabled: true
