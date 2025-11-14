@@ -2,6 +2,7 @@ import { ReactNode, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { ProfileModal } from '../components/ProfileModal';
 
 const titles: Record<string, string> = {
   '/': 'Dashboard',
@@ -26,6 +27,8 @@ export const AppLayout = ({ children }: Props) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
   const dynamicTitle = location.pathname.startsWith('/cases/')
     ? 'Dosya Detayı'
     : location.pathname.startsWith('/mediation/') &&
@@ -70,7 +73,7 @@ export const AppLayout = ({ children }: Props) => {
                   className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                   style={{
                     backgroundImage:
-                      'url("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80")',
+                      `url("${user?.avatarUrl || 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80'}")`,
                   }}
                 />
                 <div className="flex flex-col text-right">
@@ -80,7 +83,18 @@ export const AppLayout = ({ children }: Props) => {
                 <span className="material-symbols-outlined text-[#A0AEC0]">expand_more</span>
               </button>
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-40 rounded-lg border border-[#E2E8F0] bg-white shadow-md z-20">
+                <div className="absolute right-0 mt-2 w-44 rounded-lg border border-[#E2E8F0] bg-white shadow-md z-20">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileModalOpen(true);
+                      setProfileOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#1A202C] hover:bg-gray-50"
+                  >
+                    <span className="material-symbols-outlined text-base">manage_accounts</span>
+                    Profili Düzenle
+                  </button>
                   <button
                     type="button"
                     onClick={logout}
@@ -96,6 +110,7 @@ export const AppLayout = ({ children }: Props) => {
         </header>
         <div className="flex-1 p-8 bg-[#F7FAFC]">{children}</div>
       </main>
+      <ProfileModal open={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
     </div>
   );
 }

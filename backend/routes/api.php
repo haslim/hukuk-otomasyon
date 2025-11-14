@@ -11,6 +11,7 @@ use App\Controllers\SearchController;
 use App\Controllers\TaskController;
 use App\Controllers\WorkflowController;
 use App\Controllers\UserController;
+use App\Controllers\ProfileController;
 use App\Middleware\AuditLogMiddleware;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -24,6 +25,11 @@ return function (App $app) {
 
         $group->group('', function (Group $protected) {
             $protected->get('/dashboard', [DashboardController::class, 'index']);
+
+            $protected->group('/profile', function (Group $profile) {
+                $profile->get('', [ProfileController::class, 'me']);
+                $profile->put('', [ProfileController::class, 'update']);
+            });
 
             $protected->get('/users', [UserController::class, 'index']);
 
