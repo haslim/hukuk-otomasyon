@@ -17,7 +17,7 @@ deployment:
       - Thumbs.db
     include_paths:
       - backend/
-      - frontend/dist/
+      - frontend/
     post_deployment_commands:
       - cd /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend
       - php database/migrate.php

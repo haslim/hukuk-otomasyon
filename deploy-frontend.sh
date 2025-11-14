@@ -12,7 +12,7 @@ echo "======================================="
 SERVER=${FTP_SERVER:-"ftp.bgaofis.billurguleraslim.av.tr"}
 USERNAME=${FTP_USERNAME:-"haslim@bgaofis.billurguleraslim.av.tr"}
 PASSWORD=${FTP_PASSWORD:-"Fener1907****"}
-SERVER_DIR=${SERVER_DIR:-"/public_html/"}
+SERVER_DIR=${SERVER_DIR:-"/public_html/bgaofis.billurguleraslim.av.tr/"}
 LOCAL_DIR="./frontend/dist/"
 
 # Colors for output

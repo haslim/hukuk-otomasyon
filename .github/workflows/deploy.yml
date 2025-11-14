@@ -55,7 +55,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./backend/
-        server-dir: ${{ secrets.FTP_BACKEND_DIR }}
+        server-dir: /public_html/bgaofis.billurguleraslim.av.tr/backend/
         exclude: "**/.git* **/node_modules/** **/tests/** **/.env* **/composer.lock"
         
     - name: Run database migrations (remote)
@@ -110,7 +110,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./frontend/dist/
-        server-dir: ${{ secrets.FTP_FRONTEND_DIR }}
+        server-dir: /public_html/bgaofis.billurguleraslim.av.tr/
         exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
 
   test-backend:
