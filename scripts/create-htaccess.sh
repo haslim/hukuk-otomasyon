@@ -10,6 +10,7 @@ cat > frontend/dist/.htaccess << 'EOF'
     RewriteEngine On
     RewriteBase /
     RewriteRule ^index\.html$ - [L]
+    RewriteCond %{REQUEST_URI} !^/backend/
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule . index.html [L]
