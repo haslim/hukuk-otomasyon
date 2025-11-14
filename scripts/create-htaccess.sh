@@ -3,6 +3,9 @@
 # Create .htaccess file for frontend deployment
 cat > frontend/dist/.htaccess << 'EOF'
 # Frontend .htaccess for React Router
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
