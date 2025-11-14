@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Support\AuthContext;
 use App\Models\User;

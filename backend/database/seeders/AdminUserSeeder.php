@@ -6,7 +6,7 @@ use App\Models\User;
 
 class AdminUserSeeder
 {
-    private const NAME = 'Ali Haydar Aslım';
+    private const NAME = 'Ali Haydar AslÄ±m';
     private const EMAIL = 'alihaydraslim@gmail.com';
     private const PASSWORD = 'test123456';
 
@@ -24,7 +24,7 @@ class AdminUserSeeder
                 'phone' => null,
             ]);
 
-            echo "Admin kullanıcısı oluşturuldu: " . self::EMAIL . PHP_EOL;
+            echo "Admin kullanÄ±cÄ±sÄ± oluÅŸturuldu: " . self::EMAIL . PHP_EOL;
             return;
         }
 
@@ -36,6 +36,6 @@ class AdminUserSeeder
         $user->password = $hashedPassword;
         $user->save();
 
-        echo "Admin kullanıcısı güncellendi: " . self::EMAIL . PHP_EOL;
+        echo "Admin kullanÄ±cÄ±sÄ± gÃ¼ncellendi: " . self::EMAIL . PHP_EOL;
     }
 }

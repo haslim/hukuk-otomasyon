@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'default' => $_ENV['DB_CONNECTION'] ?? 'mysql',

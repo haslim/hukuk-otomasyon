@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'name' => 'BGAofis Hukuk Otomasyon',

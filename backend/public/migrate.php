@@ -62,7 +62,7 @@ try {
         if (is_object($migration) && method_exists($migration, 'up')) {
             echo "Running: " . basename($file) . "... ";
             $migration->up();
-            echo "✓ Done\n";
+            echo "âœ“ Done\n";
         }
     }
     

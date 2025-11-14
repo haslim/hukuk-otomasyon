@@ -32,12 +32,12 @@ echo "Creating necessary directories...\n";
 foreach ($directories as $dir) {
     if (!is_dir($dir)) {
         if (mkdir($dir, 0755, true)) {
-            echo "✓ Created directory: " . basename($dir) . "\n";
+            echo "âœ“ Created directory: " . basename($dir) . "\n";
         } else {
-            echo "✗ Failed to create directory: " . basename($dir) . "\n";
+            echo "âœ— Failed to create directory: " . basename($dir) . "\n";
         }
     } else {
-        echo "✓ Directory already exists: " . basename($dir) . "\n";
+        echo "âœ“ Directory already exists: " . basename($dir) . "\n";
     }
 }
 
@@ -64,10 +64,10 @@ try {
     
     $connection = $capsule->getConnection();
     $connection->getPdo();
-    echo "✓ Database connection successful\n";
+    echo "âœ“ Database connection successful\n";
     
 } catch (Exception $e) {
-    echo "✗ Database connection failed: " . $e->getMessage() . "\n";
+    echo "âœ— Database connection failed: " . $e->getMessage() . "\n";
     echo "Please check your database configuration in .env file\n";
 }
 
@@ -85,9 +85,9 @@ foreach ($filesToCheck as $file => $expectedPerm) {
     if (file_exists($path)) {
         $currentPerm = substr(sprintf('%o', fileperms($path)), -4);
         if ($currentPerm >= $expectedPerm) {
-            echo "✓ Permissions OK for $file: $currentPerm\n";
+            echo "âœ“ Permissions OK for $file: $currentPerm\n";
         } else {
-            echo "⚠ Consider setting permissions for $file to: " . decoct($expectedPerm) . "\n";
+            echo "âš  Consider setting permissions for $file to: " . decoct($expectedPerm) . "\n";
         }
     }
 }

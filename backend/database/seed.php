@@ -10,7 +10,7 @@ $seeders = [
 
 foreach ($seeders as $class) {
     if (!class_exists($class)) {
-        echo "Seeder bulunamadı: {$class}" . PHP_EOL;
+        echo "Seeder bulunamadÄ±: {$class}" . PHP_EOL;
         continue;
     }
 
