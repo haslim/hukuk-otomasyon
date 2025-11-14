@@ -4,7 +4,7 @@ const links = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
   { to: '/cases', label: 'Dosyalar', icon: 'folder' },
   { to: '/clients', label: 'Müvekkiller', icon: 'group' },
-  { to: '/finance', label: 'Kasa', icon: 'account_balance_wallet' },
+  { to: '/finance/cash', label: 'Kasa', icon: 'account_balance_wallet' },
   { to: '/documents', label: 'Dokümanlar', icon: 'folder_open' },
   { to: '/notifications', label: 'Bildirimler', icon: 'notifications' },
   { to: '/workflow', label: 'Workflow', icon: 'route' },

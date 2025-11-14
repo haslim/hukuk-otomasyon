@@ -1,5 +1,6 @@
 ﻿import { FinanceApi } from '../../api/modules/finance';
 import { useAsyncData } from '../../hooks/useAsyncData';
+import { Link } from 'react-router-dom';
 
 export const FinancePage = () => {
   const { data, isLoading } = useAsyncData(['cash-flow'], FinanceApi.cashFlow);
@@ -22,6 +23,16 @@ export const FinancePage = () => {
           <h3 className="text-sm text-slate-500">Giderler</h3>
           <p className="text-3xl font-bold text-rose-600">₺{data?.expense ?? 0}</p>
         </article>
+      </div>
+
+      <div className="mt-6">
+        <Link
+          to="/finance/cash"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white font-medium hover:bg-primary/90 transition-colors"
+        >
+          <span className="material-symbols-outlined">account_balance_wallet</span>
+          Kasa Hesabı Detayları
+        </Link>
       </div>
     </section>
   );

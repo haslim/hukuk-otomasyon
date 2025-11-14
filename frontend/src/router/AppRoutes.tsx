@@ -6,6 +6,7 @@ import { CaseDetailPage } from '../pages/Cases/CaseDetailPage';
 import { WorkflowPage } from '../pages/Workflow/WorkflowPage';
 import { DocumentsPage } from '../pages/Documents/DocumentsPage';
 import { FinancePage } from '../pages/Finance/FinancePage';
+import { CashAccountPage } from '../pages/Finance/CashAccountPage';
 import { NotificationsPage } from '../pages/Notifications/NotificationsPage';
 import { SearchPage } from '../pages/Search/SearchPage';
 
@@ -18,6 +19,7 @@ export const AppRoutes = () => (
     <Route path="/workflow" element={<WorkflowPage />} />
     <Route path="/documents" element={<DocumentsPage />} />
     <Route path="/finance" element={<FinancePage />} />
+    <Route path="/finance/cash" element={<CashAccountPage />} />
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route path="/search" element={<SearchPage />} />
   </Routes>
