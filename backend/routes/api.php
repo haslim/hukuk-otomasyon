@@ -10,6 +10,7 @@ use App\Controllers\NotificationController;
 use App\Controllers\SearchController;
 use App\Controllers\TaskController;
 use App\Controllers\WorkflowController;
+use App\Controllers\UserController;
 use App\Middleware\AuditLogMiddleware;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -23,6 +24,8 @@ return function (App $app) {
 
         $group->group('', function (Group $protected) {
             $protected->get('/dashboard', [DashboardController::class, 'index']);
+
+            $protected->get('/users', [UserController::class, 'index']);
 
             $protected->group('/clients', function (Group $clients) {
                 $clients->get('', [ClientController::class, 'index']);
