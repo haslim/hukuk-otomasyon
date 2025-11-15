@@ -69,20 +69,10 @@ export const Sidebar = () => {
       <button
         type="button"
         onClick={handleLogout}
-        className="mt-auto flex items-center gap-3 p-3 rounded-lg bg-black/20 hover:bg-black/30 transition-colors"
+        className="mt-auto flex items-center gap-3 p-3 rounded-lg bg-black/20 hover:bg-black/30 transition-colors justify-center"
       >
-        <div
-          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-          style={{
-            backgroundImage:
-              'url("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80")',
-          }}
-        />
-        <div className="flex flex-col">
-          <h1 className="text-white text-sm font-semibold leading-tight">Ali Haydar Aslim</h1>
-          <p className="text-[#A0AEC0] text-xs leading-tight">Avukat</p>
-        </div>
-        <span className="material-symbols-outlined ml-auto text-white">logout</span>
+        <span className="material-symbols-outlined text-white">logout</span>
+        <span className="text-white text-sm font-semibold">Çıkış Yap</span>
       </button>
     </aside>
   );
