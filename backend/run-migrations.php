@@ -1,29 +1,15 @@
 <?php
 /**
- * Web-based Database Migration Runner
- * Use this only if you don't have terminal/SSH access to your hosting
- *
- * SECURITY: This file should be removed after successful migration
+ * Database Migration Runner for Production
+ * This script will create the missing finance_transactions table and other tables
  */
-
-// Security check - allow only from specific IP or with a key
-$allowedIPs = ['127.0.0.1', '::1']; // Add your IP here
-$securityKey = $_GET['key'] ?? '';
-
-if (!in_array($_SERVER['REMOTE_ADDR'], $allowedIPs) && $securityKey !== 'bgaofis2024migration') {
-    http_response_code(403);
-    die('Access denied');
-}
-
-// Set content type
-header('Content-Type: text/plain; charset=utf-8');
 
 echo "BGAofis Law Office Automation - Database Migration\n";
 echo "==================================================\n\n";
 
 try {
     // Load environment
-    $basePath = dirname(__DIR__);
+    $basePath = __DIR__;
     require_once $basePath . '/vendor/autoload.php';
 
     if (file_exists($basePath . '/.env')) {
@@ -48,8 +34,8 @@ try {
     $capsule->bootEloquent();
 
     echo "Database connection established successfully.\n";
-    echo "Database: " . $_ENV['DB_DATABASE'] . "\n";
-    echo "Host: " . $_ENV['DB_HOST'] . "\n\n";
+    echo "Database: " . ($_ENV['DB_DATABASE'] ?? 'bgaofis') . "\n";
+    echo "Host: " . ($_ENV['DB_HOST'] ?? '127.0.0.1') . "\n\n";
 
     // Run migrations
     $migrationsPath = $basePath . '/database/migrations';
@@ -71,7 +57,7 @@ try {
     echo "\nMigration completed successfully!\n";
 
     // Optional: Run seeders
-    if (isset($_GET['seed']) && $_GET['seed'] === 'true') {
+    if (isset($argv[1]) && $argv[1] === 'seed') {
         echo "\nRunning seeders:\n";
         echo "----------------\n";
 
@@ -84,7 +70,7 @@ try {
         }
     }
 
-    echo "\nIMPORTANT: Delete this file (migrate.php) for security!\n";
+    echo "\nAll database tables have been created successfully!\n";
 
 } catch (Exception $e) {
     echo "\nERROR: " . $e->getMessage() . "\n";
