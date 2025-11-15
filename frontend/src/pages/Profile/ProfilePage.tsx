@@ -1,16 +1,25 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { ProfileApi } from '../../api/modules/profile';
 
 const DEFAULT_AVATAR =
   'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&auto=format&fit=crop&q=80';
 
 export const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name ?? '',
+    title: user?.title ?? '',
+    avatarUrl: user?.avatarUrl ?? '',
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileMessage, setProfileMessage] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   const roleLabel = useMemo(() => {
     if (user?.roles && user.roles.length > 0) {
@@ -48,6 +57,43 @@ export const ProfilePage = () => {
     { label: 'E-posta', value: user?.email ?? 'ornek@bgaofis.com' },
     { label: 'Rol(ler)', value: roleLabel },
   ];
+
+  useEffect(() => {
+    setProfileForm({
+      name: user?.name ?? '',
+      title: user?.title ?? '',
+      avatarUrl: user?.avatarUrl ?? '',
+    });
+  }, [user]);
+
+  const handleProfileChange = (field: keyof typeof profileForm) => (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setProfileForm((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+
+  const handleProfileSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setProfileMessage(null);
+    setProfileError(null);
+    setSavingProfile(true);
+
+    try {
+      const updated = await ProfileApi.updateProfile({
+        name: profileForm.name,
+        title: profileForm.title,
+        avatarUrl: profileForm.avatarUrl,
+      });
+      setUser(updated);
+      setProfileMessage('Profil güncellendi.');
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ?? 'Profil güncellenirken bir hata oluştu.';
+      setProfileError(message);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -107,6 +153,65 @@ export const ProfilePage = () => {
             </div>
           ))}
         </dl>
+      </section>
+
+      <section className="rounded-[32px] border border-[#e2e8f0] bg-white p-6 shadow-sm">
+        <div className="mb-4">
+          <h2 className="text-lg font-bold text-[#0e121b]">Profil Bilgilerini Güncelle</h2>
+          <p className="text-sm text-[#64748b]">
+            Fotoğraf, ad soyad ve unvan gibi bilgilerini hızlıca düzenle.
+          </p>
+        </div>
+        <form className="space-y-5" onSubmit={handleProfileSubmit}>
+          <div>
+            <label className="text-sm font-medium text-[#475569]" htmlFor="avatar-url">
+              Profil Fotoğrafı (URL)
+            </label>
+            <input
+              id="avatar-url"
+              type="url"
+              value={profileForm.avatarUrl}
+              onChange={handleProfileChange('avatarUrl')}
+              className="mt-2 w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm focus:border-[#2463eb] focus:outline-none"
+              placeholder="https://"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-[#475569]" htmlFor="full-name">
+              Ad Soyad
+            </label>
+            <input
+              id="full-name"
+              type="text"
+              value={profileForm.name}
+              onChange={handleProfileChange('name')}
+              className="mt-2 w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm focus:border-[#2463eb] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-[#475569]" htmlFor="title">
+              Ünvan
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={profileForm.title}
+              onChange={handleProfileChange('title')}
+              className="mt-2 w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm focus:border-[#2463eb] focus:outline-none"
+            />
+          </div>
+          {profileError && <p className="text-sm font-medium text-red-600">{profileError}</p>}
+          {profileMessage && <p className="text-sm font-medium text-green-600">{profileMessage}</p>}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={savingProfile}
+              className="rounded-xl bg-[#2463eb] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1b4dda] disabled:opacity-70"
+            >
+              {savingProfile ? 'Kaydediliyor...' : 'Bilgileri Kaydet'}
+            </button>
+          </div>
+        </form>
       </section>
 
       <section className="rounded-[32px] border border-[#e2e8f0] bg-white p-6 shadow-sm">
