@@ -23,6 +23,19 @@ class UserController extends Controller
         });
 
         return $this->json($response, $users->all());
+    public function roles(Request $request, Response $response): Response
+    {
+        $roles = \App\Models\Role::all()->map(function (\App\Models\Role $role) {
+            return [
+                'id' => $role->id,
+                'name' => $role->name,
+                'permissions' => $role->permissions->pluck('name')->all(),
+                'createdAt' => $role->created_at ? $role->created_at->toDateTimeString() : null,
+                'updatedAt' => $role->updated_at ? $role->updated_at->toDateTimeString() : null,
+            ];
+        });
+
+        return $this->json($response, $roles);
     }
 }
 

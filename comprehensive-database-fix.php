@@ -4,22 +4,27 @@
  * This script fixes all database schema mismatches between application and database
  */
 
+// Load autoloader first
+require_once 'vendor/autoload.php';
+
+// Import required classes
+use Dotenv\Dotenv;
+use Illuminate\Database\Capsule\Manager;
+
 echo "BGAofis Law Office Automation - Comprehensive Database Schema Fix\n";
 echo "================================================================\n\n";
 
 // Load environment variables
 if (file_exists('.env')) {
     echo "Loading environment variables from .env...\n";
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 }
 
 // Test database connection
 echo "1. Testing database connection...\n";
 try {
-    require_once 'vendor/autoload.php';
-    
-    $capsule = new Illuminate\Database\Capsule\Manager();
+    $capsule = new Manager();
     $capsule->addConnection([
         'driver' => $_ENV['DB_CONNECTION'] ?? 'mysql',
         'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
