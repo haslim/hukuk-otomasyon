@@ -47,6 +47,9 @@ try {
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
+    // Set up Schema facade
+    Illuminate\Support\Facades\Schema::setFacadeApplication($capsule->getContainer());
+
     echo "Database connection established successfully.\n";
     echo "Database: " . $_ENV['DB_DATABASE'] . "\n";
     echo "Host: " . $_ENV['DB_HOST'] . "\n\n";
