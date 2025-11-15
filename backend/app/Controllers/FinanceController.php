@@ -34,6 +34,8 @@ class FinanceController extends Controller
     {
         $summary = $this->financeService->cashFlowSummary();
         return $this->json($response, $summary);
+    }
+
     public function cashStats(Request $request, Response $response): Response
     {
         $stats = $this->financeService->cashStats();

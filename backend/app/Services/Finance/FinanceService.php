@@ -25,4 +25,14 @@ class FinanceService
     {
         return $this->finance->create($data);
     }
+
+    public function cashStats(): array
+    {
+        return $this->finance->getCashStats();
+    }
+
+    public function cashTransactions(): array
+    {
+        return $this->finance->getCashTransactions()->toArray();
+    }
 }

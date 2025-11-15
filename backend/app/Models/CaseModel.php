@@ -9,6 +9,15 @@ class CaseModel extends BaseModel
 {
     protected $table = 'cases';
 
+    protected $fillable = [
+        'client_id',
+        'case_no',
+        'type',
+        'title',
+        'subject',
+        'metadata'
+    ];
+
     protected $casts = [
         'metadata' => 'array'
     ];
