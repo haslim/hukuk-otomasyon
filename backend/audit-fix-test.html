@@ -119,10 +119,24 @@
         <!-- Fix Tab -->
         <div id="fix-tab" class="tab-content active">
             <div class="step">
-                <h3>Step 1: Apply Complete Fix</h3>
-                <p>Click the button below to run the complete fix script that addresses both database and routing issues:</p>
+                <h3>Step 1: Apply Foreign Key Safe Fix (Recommended)</h3>
+                <p><strong>Use this first if you have foreign key constraints on audit_logs table:</strong></p>
+                <button onclick="runForeignKeySafeFix()" id="foreignKeyFixBtn">🔐 Run Foreign Key Safe Fix</button>
+                <div id="foreignKeyFixResult"></div>
+            </div>
+            
+            <div class="step">
+                <h3>Step 2: Alternative Complete Fix</h3>
+                <p>Use this if the foreign key safe fix doesn't work:</p>
                 <button onclick="runCompleteFix()" id="completeFixBtn">🚀 Run Complete Fix</button>
                 <div id="completeFixResult"></div>
+            </div>
+            
+            <div class="step">
+                <h3>Step 3: Check Routes Configuration</h3>
+                <p>Verify routes file is properly configured:</p>
+                <button onclick="checkRoutes()" id="routesCheckBtn">📋 Check Routes</button>
+                <div id="routesCheckResult"></div>
             </div>
         </div>
 
@@ -215,6 +229,68 @@ $protected->group('/clients', function (Group $clients) {
             // Show selected tab
             document.getElementById(tabName + '-tab').classList.add('active');
             event.target.classList.add('active');
+        }
+
+        async function runForeignKeySafeFix() {
+            const btn = document.getElementById('foreignKeyFixBtn');
+            const result = document.getElementById('foreignKeyFixResult');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Running foreign key safe fix...';
+            result.innerHTML = '<div class="status info">Executing foreign key safe fix script...</div>';
+
+            try {
+                const response = await fetch('./fix-audit-foreign-key-safe.php', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/plain',
+                    }
+                });
+
+                const text = await response.text();
+                
+                if (response.ok) {
+                    result.innerHTML = `<div class="status success"><strong>✅ Foreign Key Safe Fix Applied Successfully!</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
+                } else {
+                    result.innerHTML = `<div class="status error"><strong>❌ Foreign Key Safe Fix Failed:</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🔐 Run Foreign Key Safe Fix';
+        }
+
+        async function checkRoutes() {
+            const btn = document.getElementById('routesCheckBtn');
+            const result = document.getElementById('routesCheckResult');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Checking routes...';
+            result.innerHTML = '<div class="status info">Checking routes configuration...</div>';
+
+            try {
+                const response = await fetch('./fix-routes-corrected.php', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/plain',
+                    }
+                });
+
+                const text = await response.text();
+                
+                if (response.ok) {
+                    result.innerHTML = `<div class="status success"><strong>✅ Routes Check Completed!</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
+                } else {
+                    result.innerHTML = `<div class="status error"><strong>❌ Routes Check Failed:</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+
+            btn.disabled = false;
+            btn.textContent = '📋 Check Routes';
         }
 
         async function runCompleteFix() {
@@ -386,8 +462,20 @@ $protected->group('/clients', function (Group $clients) {
             }
         }
 
-        // Auto-check if fix file exists
+        // Auto-check if fix files exist
         window.onload = function() {
+            // Check foreign key safe fix
+            fetch('./fix-audit-foreign-key-safe.php', { method: 'HEAD' })
+                .then(response => {
+                    if (!response.ok) {
+                        document.getElementById('foreignKeyFixResult').innerHTML = '<div class="status warning">⚠️ Foreign key safe fix script not found. Please ensure fix-audit-foreign-key-safe.php is uploaded to the server.</div>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('foreignKeyFixResult').innerHTML = '<div class="status warning">⚠️ Cannot check for foreign key safe fix script. Please ensure it\'s uploaded to the server.</div>';
+                });
+            
+            // Check complete fix
             fetch('./complete-fix-deployment.php', { method: 'HEAD' })
                 .then(response => {
                     if (!response.ok) {
@@ -395,7 +483,18 @@ $protected->group('/clients', function (Group $clients) {
                     }
                 })
                 .catch(() => {
-                    document.getElementById('completeFixResult').innerHTML = '<div class="status warning">⚠️ Cannot check for fix script. Please ensure it\'s uploaded to the server.</div>';
+                    document.getElementById('completeFixResult').innerHTML = '<div class="status warning">⚠️ Cannot check for complete fix script. Please ensure it\'s uploaded to the server.</div>';
+                });
+                
+            // Check routes fix
+            fetch('./fix-routes-corrected.php', { method: 'HEAD' })
+                .then(response => {
+                    if (!response.ok) {
+                        document.getElementById('routesCheckResult').innerHTML = '<div class="status warning">⚠️ Routes check script not found. Please ensure fix-routes-corrected.php is uploaded to the server.</div>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('routesCheckResult').innerHTML = '<div class="status warning">⚠️ Cannot check for routes check script. Please ensure it\'s uploaded to the server.</div>';
                 });
         };
     </script>
