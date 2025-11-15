@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -23,9 +24,11 @@ class UserController extends Controller
         });
 
         return $this->json($response, $users->all());
+    }
+
     public function roles(Request $request, Response $response): Response
     {
-        $roles = \App\Models\Role::all()->map(function (\App\Models\Role $role) {
+        $roles = Role::all()->map(function (Role $role) {
             return [
                 'id' => $role->id,
                 'name' => $role->name,
@@ -38,4 +41,3 @@ class UserController extends Controller
         return $this->json($response, $roles);
     }
 }
-
