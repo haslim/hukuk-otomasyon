@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Logs Fix - BGAofis</title>
+    <title>Complete Fix - BGAofis Law Office</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -39,6 +39,8 @@
         }
         button:hover { background-color: #0056b3; }
         button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        button.secondary { background-color: #6c757d; }
+        button.secondary:hover { background-color: #545b62; }
         .code {
             background-color: #f8f9fa;
             padding: 15px;
@@ -46,6 +48,8 @@
             font-family: 'Courier New', monospace;
             margin: 10px 0;
             border-left: 4px solid #007bff;
+            font-size: 12px;
+            white-space: pre-wrap;
         }
         .step {
             margin: 20px 0;
@@ -53,39 +57,133 @@
             border-left: 4px solid #28a745;
             background-color: #f8fff9;
         }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔧 Audit Logs Fix - BGAofis Law Office</h1>
+        <h1>🔧 Complete Fix - BGAofis Law Office</h1>
         
         <div class="status info">
-            <strong>Issue:</strong> Database error causing 500 Internal Server Error on /api/clients endpoint due to UUID truncation in audit_logs table.
+            <strong>Issues Fixed:</strong>
+            <ul>
+                <li>Database error: UUID truncation in audit_logs table causing 500 errors</li>
+                <li>Routing error: 405 Method Not Allowed on /api/clients</li>
+                <li>Authentication: Proper JWT token handling</li>
+            </ul>
         </div>
 
-        <div class="step">
-            <h3>Step 1: Apply Database Fix</h3>
-            <p>Click the button below to run the automated fix script:</p>
-            <button onclick="runFix()" id="fixBtn">🚀 Run Database Fix</button>
-            <div id="fixResult"></div>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('fix')">🚀 Apply Fix</button>
+            <button class="tab" onclick="showTab('test')">🧪 Test API</button>
+            <button class="tab" onclick="showTab('auth')">🔐 Authentication</button>
+            <button class="tab" onclick="showTab('manual')">⚙️ Manual Fix</button>
         </div>
 
-        <div class="step">
-            <h3>Step 2: Test API Endpoint</h3>
-            <p>After the fix is applied, test the clients API endpoint:</p>
-            <button onclick="testAPI()" id="testBtn">🧪 Test /api/clients</button>
-            <div id="testResult"></div>
+        <!-- Fix Tab -->
+        <div id="fix-tab" class="tab-content active">
+            <div class="step">
+                <h3>Step 1: Apply Complete Fix</h3>
+                <p>Click the button below to run the complete fix script that addresses both database and routing issues:</p>
+                <button onclick="runCompleteFix()" id="completeFixBtn">🚀 Run Complete Fix</button>
+                <div id="completeFixResult"></div>
+            </div>
         </div>
 
-        <div class="step">
-            <h3>Step 3: Manual Fix (if needed)</h3>
-            <p>If the automated fix doesn't work, you can run these SQL commands manually:</p>
-            <div class="code">
+        <!-- Test Tab -->
+        <div id="test-tab" class="tab-content">
+            <div class="step">
+                <h3>Test API Endpoints</h3>
+                <div class="input-group">
+                    <label for="authToken">JWT Token (for authenticated endpoints):</label>
+                    <input type="text" id="authToken" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                </div>
+                
+                <button onclick="testClientsAPI()">🧪 Test /api/clients</button>
+                <button onclick="testAuthAPI()">🔐 Test /api/auth/login</button>
+                <button onclick="testDashboardAPI()">📊 Test /api/dashboard</button>
+                
+                <div id="testResult"></div>
+            </div>
+        </div>
+
+        <!-- Auth Tab -->
+        <div id="auth-tab" class="tab-content">
+            <div class="step">
+                <h3>Authentication Helper</h3>
+                <div class="input-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" placeholder="admin@example.com">
+                </div>
+                <div class="input-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" placeholder="password">
+                </div>
+                <button onclick="login()">🔐 Login & Get Token</button>
+                <div id="authResult"></div>
+            </div>
+        </div>
+
+        <!-- Manual Tab -->
+        <div id="manual-tab" class="tab-content">
+            <div class="step">
+                <h3>Manual SQL Fix</h3>
+                <p>If the automated fix doesn't work, run these SQL commands manually:</p>
+                <div class="code">
 ALTER TABLE audit_logs MODIFY COLUMN entity_id VARCHAR(36) NULL;
 ALTER TABLE audit_logs MODIFY COLUMN user_id VARCHAR(36) NULL;
 ALTER TABLE audit_logs MODIFY COLUMN ip VARCHAR(45) NULL;
 ALTER TABLE audit_logs MODIFY COLUMN metadata JSON NULL;
 ALTER TABLE audit_logs ADD COLUMN deleted_at TIMESTAMP NULL;
+                </div>
+                
+                <h3>Manual Routes Check</h3>
+                <p>Ensure your routes/api.php file contains:</p>
+                <div class="code">
+$protected->group('/clients', function (Group $clients) {
+    $clients->get('', [ClientController::class, 'index']);
+    $clients->post('', [ClientController::class, 'store']);
+    $clients->get('/{id}', [ClientController::class, 'show']);
+    $clients->put('/{id}', [ClientController::class, 'update']);
+    $clients->delete('/{id}', [ClientController::class, 'destroy']);
+})->add(new AuditLogMiddleware('client'));
+                </div>
             </div>
         </div>
 
@@ -96,24 +194,39 @@ ALTER TABLE audit_logs ADD COLUMN deleted_at TIMESTAMP NULL;
         <div class="status info">
             <strong>📋 Expected Results:</strong>
             <ul>
-                <li>/api/clients should return 200 OK</li>
+                <li>/api/clients should return 200 OK (with auth token)</li>
                 <li>No more "Data truncated for column 'entity_id'" errors</li>
+                <li>No more 405 Method Not Allowed errors</li>
                 <li>Audit logging should work properly with UUIDs</li>
             </ul>
         </div>
     </div>
 
     <script>
-        async function runFix() {
-            const btn = document.getElementById('fixBtn');
-            const result = document.getElementById('fixResult');
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function runCompleteFix() {
+            const btn = document.getElementById('completeFixBtn');
+            const result = document.getElementById('completeFixResult');
             
             btn.disabled = true;
-            btn.textContent = '⏳ Running fix...';
-            result.innerHTML = '<div class="status info">Executing database fix script...</div>';
+            btn.textContent = '⏳ Running complete fix...';
+            result.innerHTML = '<div class="status info">Executing complete fix script...</div>';
 
             try {
-                const response = await fetch('./fix-audit-deployment.php', {
+                const response = await fetch('./complete-fix-deployment.php', {
                     method: 'GET',
                     headers: {
                         'Accept': 'text/plain',
@@ -123,59 +236,166 @@ ALTER TABLE audit_logs ADD COLUMN deleted_at TIMESTAMP NULL;
                 const text = await response.text();
                 
                 if (response.ok) {
-                    result.innerHTML = `<div class="status success"><strong>✅ Fix Completed Successfully!</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
+                    result.innerHTML = `<div class="status success"><strong>✅ Complete Fix Applied Successfully!</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
                 } else {
-                    result.innerHTML = `<div class="status error"><strong>❌ Fix Failed:</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
+                    result.innerHTML = `<div class="status error"><strong>❌ Complete Fix Failed:</strong><br><pre style="white-space: pre-wrap; font-size: 12px;">${text}</pre></div>`;
                 }
             } catch (error) {
                 result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
             }
 
             btn.disabled = false;
-            btn.textContent = '🚀 Run Database Fix';
+            btn.textContent = '🚀 Run Complete Fix';
         }
 
-        async function testAPI() {
-            const btn = document.getElementById('testBtn');
+        async function testClientsAPI() {
+            const token = document.getElementById('authToken').value;
             const result = document.getElementById('testResult');
             
-            btn.disabled = true;
-            btn.textContent = '⏳ Testing API...';
+            const headers = {
+                'Accept': 'application/json',
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
             result.innerHTML = '<div class="status info">Testing /api/clients endpoint...</div>';
 
             try {
                 const response = await fetch('./api/clients', {
                     method: 'GET',
+                    headers: headers
+                });
+
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+                
+                if (response.ok) {
+                    result.innerHTML = `<div class="status success"><strong>✅ /api/clients Test Successful!</strong><br>Status: ${response.status}<br>Response: <pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    result.innerHTML = `<div class="status error"><strong>❌ /api/clients Test Failed:</strong><br>Status: ${response.status}<br>Response: <pre>${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</pre></div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+        }
+
+        async function testAuthAPI() {
+            const result = document.getElementById('testResult');
+            
+            result.innerHTML = '<div class="status info">Testing /api/auth/login endpoint...</div>';
+
+            try {
+                const response = await fetch('./api/auth/login', {
+                    method: 'POST',
                     headers: {
                         'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'password'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<div class="status success"><strong>✅ /api/auth/login Test Successful!</strong><br>Status: ${response.status}<br>Response: <pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                    if (data.token) {
+                        document.getElementById('authToken').value = data.token;
+                    }
+                } else {
+                    result.innerHTML = `<div class="status error"><strong>❌ /api/auth/login Test Failed:</strong><br>Status: ${response.status}<br>Response: <pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+        }
+
+        async function testDashboardAPI() {
+            const token = document.getElementById('authToken').value;
+            const result = document.getElementById('testResult');
+            
+            if (!token) {
+                result.innerHTML = '<div class="status warning">⚠️ Authentication token required for /api/dashboard</div>';
+                return;
+            }
+            
+            result.innerHTML = '<div class="status info">Testing /api/dashboard endpoint...</div>';
+
+            try {
+                const response = await fetch('./api/dashboard', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    result.innerHTML = `<div class="status success"><strong>✅ API Test Successful!</strong><br>Status: ${response.status}<br>Response: ${JSON.stringify(data, null, 2)}</div>`;
+                    result.innerHTML = `<div class="status success"><strong>✅ /api/dashboard Test Successful!</strong><br>Status: ${response.status}<br>Response: <pre>${JSON.stringify(data, null, 2)}</pre></div>`;
                 } else {
-                    result.innerHTML = `<div class="status error"><strong>❌ API Test Failed:</strong><br>Status: ${response.status}<br>Response: ${JSON.stringify(data, null, 2)}</div>`;
+                    result.innerHTML = `<div class="status error"><strong>❌ /api/dashboard Test Failed:</strong><br>Status: ${response.status}<br>Response: <pre>${JSON.stringify(data, null, 2)}</pre></div>`;
                 }
             } catch (error) {
                 result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
             }
+        }
 
-            btn.disabled = false;
-            btn.textContent = '🧪 Test /api/clients';
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const result = document.getElementById('authResult');
+            
+            if (!email || !password) {
+                result.innerHTML = '<div class="status warning">⚠️ Email and password are required</div>';
+                return;
+            }
+            
+            result.innerHTML = '<div class="status info">Logging in...</div>';
+
+            try {
+                const response = await fetch('./api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<div class="status success"><strong>✅ Login Successful!</strong><br>Token: <pre>${data.token}</pre></div>`;
+                    document.getElementById('authToken').value = data.token;
+                } else {
+                    result.innerHTML = `<div class="status error"><strong>❌ Login Failed:</strong><br>${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="status error"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
         }
 
         // Auto-check if fix file exists
         window.onload = function() {
-            fetch('./fix-audit-deployment.php', { method: 'HEAD' })
+            fetch('./complete-fix-deployment.php', { method: 'HEAD' })
                 .then(response => {
                     if (!response.ok) {
-                        document.getElementById('fixResult').innerHTML = '<div class="status warning">⚠️ Fix script not found. Please ensure fix-audit-deployment.php is uploaded to the server.</div>';
+                        document.getElementById('completeFixResult').innerHTML = '<div class="status warning">⚠️ Complete fix script not found. Please ensure complete-fix-deployment.php is uploaded to the server.</div>';
                     }
                 })
                 .catch(() => {
-                    document.getElementById('fixResult').innerHTML = '<div class="status warning">⚠️ Cannot check for fix script. Please ensure it\'s uploaded to the server.</div>';
+                    document.getElementById('completeFixResult').innerHTML = '<div class="status warning">⚠️ Cannot check for fix script. Please ensure it\'s uploaded to the server.</div>';
                 });
         };
     </script>

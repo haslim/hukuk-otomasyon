@@ -79,7 +79,7 @@ export const Sidebar = () => {
           }}
         />
         <div className="flex flex-col">
-          <h1 className="text-white text-sm font-semibold leading-tight">Can Yılmaz</h1>
+          <h1 className="text-white text-sm font-semibold leading-tight">Ali Haydar Aslim</h1>
           <p className="text-[#A0AEC0] text-xs leading-tight">Avukat</p>
         </div>
         <span className="material-symbols-outlined ml-auto text-white">logout</span>

@@ -78,7 +78,7 @@ export const AppLayout = ({ children }: Props) => {
                   }}
                 />
                 <div className="flex flex-col text-right">
-                  <span className="text-sm font-semibold">{user?.name ?? 'Can Yılmaz'}</span>
+                  <span className="text-sm font-semibold">{user?.name ?? 'Ali Haydar Aslim'}</span>
                   <span className="text-xs text-[#A0AEC0]">{user?.title ?? 'Avukat'}</span>
                 </div>
                 <span className="material-symbols-outlined text-[#A0AEC0]">expand_more</span>
