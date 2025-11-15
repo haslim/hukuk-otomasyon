@@ -181,7 +181,8 @@ try {
 echo "<h3>🔍 Fix 4: Controller Methods</h3>";
 
 // Create a comprehensive controller fix file
-$controllerFix = '<?php
+$controllerFix = <<<'PHP'
+<?php
 /**
  * Controller Methods Fix
  * This file contains missing controller methods
@@ -310,7 +311,6 @@ if (!class_exists("FinanceController")) {
                     'income' => $incomeData['income'],
                     'expense' => $expenseData['expense']
                 ];
-                $stats = $stmt->fetch();
                 
                 // Calculate balance separately
                 $balance = $stats['income'] - $stats['expense'];
@@ -376,7 +376,7 @@ if (!method_exists("AuthController", "logout")) {
         }
     }
 }
-?>';
+PHP;
 
 file_put_contents(__DIR__ . '/controller-methods-fix.php', $controllerFix);
 echo "<p style='color: green;'>✅ Controller methods fix file created</p>";
@@ -420,7 +420,8 @@ try {
 // Fix 6: Create comprehensive test script
 echo "<h3>🔍 Fix 6: Test Script Creation</h3>";
 
-$testScript = '<?php
+$testScript = <<<'TESTSCRIPT'
+<?php
 /**
  * Comprehensive API Test Script
  * Tests all the endpoints that were failing
@@ -493,7 +494,7 @@ if ($httpCode === 200 && isset($loginResult["token"])) {
         $status = $httpCode === 200 ? "✅" : "❌";
         $color = $httpCode === 200 ? "green" : "red";
         
-        echo "<p style='color: {$color};'>{$status} {$name} ({$method} {$path}) - HTTP {$httpCode}</p>";
+        echo "<p style=\"color: {$color}\">{$status} {$name} ({$method} {$path}) - HTTP {$httpCode}</p>";
         
         if ($httpCode !== 200) {
             echo "<p style='color: orange; margin-left: 20px;'>Response: " . substr($response, 0, 200) . "...</p>";
