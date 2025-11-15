@@ -47,8 +47,15 @@ try {
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
-    // Set up Schema facade
-    Illuminate\Support\Facades\Schema::setFacadeApplication($capsule->getContainer());
+    // Set up Schema facade properly
+    $container = new Illuminate\Container\Container();
+    $container->singleton('db', function () use ($capsule) {
+        return $capsule->getDatabaseManager();
+    });
+    $container->singleton('db.schema', function () use ($capsule) {
+        return $capsule->getDatabaseManager()->connection()->getSchemaBuilder();
+    });
+    Illuminate\Support\Facades\Schema::setFacadeApplication($container);
 
     echo "Database connection established successfully.\n";
     echo "Database: " . $_ENV['DB_DATABASE'] . "\n";
