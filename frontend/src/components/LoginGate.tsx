@@ -1,6 +1,6 @@
 import { useState, ReactNode, FormEvent } from 'react';
 import { apiClient } from '../api/client';
-import { useAuth } from '../context/AuthContext';
+import { AuthUser, useAuth } from '../context/AuthContext';
 
 interface Props {
   children: ReactNode;
@@ -14,6 +14,21 @@ export const LoginGate = ({ children }: Props) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const mapUserPayload = (payload: any): AuthUser => {
+    const roles = Array.isArray(payload?.roles)
+      ? payload.roles.map((role: any) => (typeof role === 'string' ? role : role?.name ?? String(role)))
+      : undefined;
+
+    return {
+      id: payload?.id ?? '',
+      name: payload?.name ?? '',
+      email: payload?.email ?? '',
+      title: payload?.title ?? null,
+      avatarUrl: payload?.avatarUrl ?? payload?.avatar_url ?? null,
+      roles,
+    };
+  };
+
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setLoading(true);
@@ -22,11 +37,7 @@ export const LoginGate = ({ children }: Props) => {
       const { data } = await apiClient.post('/auth/login', { email, password, remember });
       setToken(data.token);
       if (data.user) {
-        setUser({
-          id: data.user.id,
-          name: data.user.name,
-          email: data.user.email,
-        });
+        setUser(mapUserPayload(data.user));
       }
     } catch (err: any) {
       const message =
@@ -122,4 +133,3 @@ export const LoginGate = ({ children }: Props) => {
 
   return <>{children}</>;
 };
-
