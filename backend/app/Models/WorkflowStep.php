@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\WorkflowTemplate;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WorkflowStep extends BaseModel

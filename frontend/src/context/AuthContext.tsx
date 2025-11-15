@@ -6,6 +6,7 @@ export interface AuthUser {
   email: string;
   title?: string;
   avatarUrl?: string;
+  roles?: string[];
 }
 
 interface AuthState {
@@ -67,4 +68,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

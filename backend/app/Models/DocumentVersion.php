@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Document;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocumentVersion extends BaseModel

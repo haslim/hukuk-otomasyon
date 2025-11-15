@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Client;
 
 class CaseModel extends BaseModel
 {
@@ -22,27 +21,27 @@ class CaseModel extends BaseModel
         'metadata' => 'array'
     ];
 
-    public function client(): BelongsTo
+    public function client()
     {
         return $this->belongsTo(Client::class);
     }
 
-    public function parties(): HasMany
+    public function parties()
     {
         return $this->hasMany(CaseParty::class, 'case_id');
     }
 
-    public function hearings(): HasMany
+    public function hearings()
     {
         return $this->hasMany(Hearing::class, 'case_id');
     }
 
-    public function tasks(): HasMany
+    public function tasks()
     {
         return $this->hasMany(Task::class, 'case_id');
     }
 
-    public function documents(): HasMany
+    public function documents()
     {
         return $this->hasMany(Document::class, 'case_id');
     }

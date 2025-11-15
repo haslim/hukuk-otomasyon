@@ -17,6 +17,7 @@ const titles: Record<string, string> = {
   '/users/roles': 'Roller & Yetkiler',
   '/mediation': 'Arabuluculuk Başvuruları',
   '/mediation/new': 'Yeni Arabuluculuk Başvurusu',
+  '/profile': 'Profilim',
 };
 
 interface Props {

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
+  { to: '/profile', label: 'Profilim', icon: 'account_circle' },
   { to: '/cases', label: 'Dosyalar', icon: 'folder' },
   { to: '/mediation', label: 'Arabuluculuk', icon: 'handshake' },
   { to: '/clients', label: 'Müvekkiller', icon: 'group' },
@@ -86,4 +87,3 @@ export const Sidebar = () => {
     </aside>
   );
 };
-

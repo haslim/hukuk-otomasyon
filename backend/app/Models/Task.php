@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends BaseModel

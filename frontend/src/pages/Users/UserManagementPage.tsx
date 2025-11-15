@@ -4,6 +4,13 @@ import { useAsyncData } from '../../hooks/useAsyncData';
 
 export const UserManagementPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    roles: [] as string[],
+    status: 'active' as 'active' | 'inactive'
+  });
   const { data: usersData, isLoading } = useAsyncData(['users'], UsersApi.getUsers);
 
   if (isLoading) return <p>Kullanıcılar yükleniyor...</p>;
@@ -40,14 +47,6 @@ export const UserManagementPage = () => {
   ];
 
   const users = usersData || defaultUsers;
-
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    roles: [] as string[],
-    status: 'active' as 'active' | 'inactive'
-  });
 
   const getStatusBadge = (status: 'active' | 'inactive') => {
     switch (status) {

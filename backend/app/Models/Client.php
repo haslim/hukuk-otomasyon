@@ -2,13 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
 class Client extends BaseModel
 {
     protected $table = 'clients';
 
-    public function cases(): HasMany
+    protected $fillable = [
+        'name',
+        'type',
+        'identifier',
+        'phone',
+        'email',
+        'labels',
+        'notes'
+    ];
+
+    protected $casts = [
+        'labels' => 'array'
+    ];
+
+    public function cases()
     {
         return $this->hasMany(CaseModel::class, 'client_id');
     }

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\CaseModel;
 
 class Hearing extends BaseModel
 {
@@ -19,7 +19,7 @@ class Hearing extends BaseModel
         'hearing_date' => 'datetime',
     ];
 
-    public function case(): BelongsTo
+    public function case()
     {
         return $this->belongsTo(CaseModel::class, 'case_id');
     }

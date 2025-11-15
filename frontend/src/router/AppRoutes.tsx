@@ -15,6 +15,7 @@ import { SearchPage } from '../pages/Search/SearchPage';
 import { MediationListPage } from '../pages/mediation/MediationListPage';
 import { MediationDetailPage } from '../pages/mediation/MediationDetailPage';
 import { MediationNewPage } from '../pages/mediation/MediationNewPage';
+import { ProfilePage } from '../pages/Profile/ProfilePage';
 
 export const AppRoutes = () => (
   <Routes>
@@ -34,5 +35,6 @@ export const AppRoutes = () => (
     <Route path="/mediation" element={<MediationListPage />} />
     <Route path="/mediation/new" element={<MediationNewPage />} />
     <Route path="/mediation/:id" element={<MediationDetailPage />} />
+    <Route path="/profile" element={<ProfilePage />} />
   </Routes>
 );
