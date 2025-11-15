@@ -10,11 +10,15 @@ header('Content-Type: text/plain; charset=utf-8');
 echo "BGAofis Law Office Automation - Database Migration\n";
 echo "==================================================\n\n";
 
-// Security check
-$securityKey = $_GET['key'] ?? '';
+// Security check - accept from both GET and command line
+$securityKey = $_GET['key'] ?? ($argv[1] ?? '');
 if ($securityKey !== 'bgaofis2024migration') {
-    http_response_code(403);
-    die('Access denied - Invalid security key');
+    if (php_sapi_name() === 'cli') {
+        die("Access denied - Invalid security key\nUsage: php migrate-standalone.php bgaofis2024migration\n");
+    } else {
+        http_response_code(403);
+        die('Access denied - Invalid security key');
+    }
 }
 
 try {
