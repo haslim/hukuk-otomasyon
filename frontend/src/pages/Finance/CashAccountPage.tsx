@@ -7,75 +7,24 @@ export const CashAccountPage = () => {
     startDate: '2024-01-01',
     endDate: '2024-12-31',
     type: 'all',
-    caseSearch: ''
+    caseSearch: '',
   });
 
   const { data: stats, isLoading: statsLoading } = useAsyncData(['cash-stats'], FinanceApi.getCashStats);
-  const { data: transactions, isLoading: transactionsLoading } = useAsyncData(['cash-transactions'], FinanceApi.getCashTransactions);
+  const { data: transactions, isLoading: transactionsLoading } = useAsyncData(
+    ['cash-transactions'],
+    FinanceApi.getCashTransactions,
+  );
 
   if (statsLoading || transactionsLoading) return <p>Kasa bilgileri yükleniyor...</p>;
 
-  const mockStats: CashStats = {
-    totalIncome: 150000,
-    totalExpense: 45000,
-    netBalance: 105000
+  const currentStats: CashStats = stats ?? {
+    totalIncome: 0,
+    totalExpense: 0,
+    netBalance: 0,
   };
 
-  const mockTransactions: CashTransaction[] = [
-    {
-      id: '1',
-      date: '15.05.2024',
-      caseNumber: '2024/101 E.',
-      clientName: 'Ahmet Yılmaz',
-      type: 'income',
-      category: 'Vekalet Ücreti',
-      amount: 25000,
-      description: 'Dava masrafları avansı'
-    },
-    {
-      id: '2',
-      date: '14.05.2024',
-      caseNumber: '2023/245 E.',
-      clientName: 'Ayşe Kara',
-      type: 'expense',
-      category: 'Mahkeme Harcı',
-      amount: 1250,
-      description: 'Temyiz başvuru harcı'
-    },
-    {
-      id: '3',
-      date: '12.05.2024',
-      caseNumber: '-',
-      clientName: '-',
-      type: 'expense',
-      category: 'Ofis Gideri',
-      amount: 350,
-      description: 'Kırtasiye malzemeleri'
-    },
-    {
-      id: '4',
-      date: '10.05.2024',
-      caseNumber: '2024/50 E.',
-      clientName: 'Mehmet Çelik',
-      type: 'income',
-      category: 'Danışmanlık',
-      amount: 5000,
-      description: 'Sözleşme danışmanlığı'
-    },
-    {
-      id: '5',
-      date: '08.05.2024',
-      caseNumber: '2023/245 E.',
-      clientName: 'Ayşe Kara',
-      type: 'expense',
-      category: 'Yol Masrafı',
-      amount: 450,
-      description: 'Ankara duruşması için yolculuk'
-    }
-  ];
-
-  const currentStats = stats || mockStats;
-  const currentTransactions = transactions || mockTransactions;
+  const currentTransactions: CashTransaction[] = transactions ?? [];
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -83,11 +32,13 @@ export const CashAccountPage = () => {
       <header className="flex flex-wrap items-center justify-between gap-4 pb-8">
         <div className="flex flex-col gap-1">
           <h1 className="text-text-light dark:text-text-dark text-3xl font-bold leading-tight tracking-tight">Kasa</h1>
-          <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">Tüm finansal gelir ve gider kayıtlarınızı yönetin.</p>
+          <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">
+            Tüm finansal gelir ve gider kayıtlarınızı yönetin.
+          </p>
         </div>
-        <button className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90 transition-colors">
+        <button className="flex min-w-[84px] cursor-not-allowed items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-300 text-gray-500 text-sm font-bold leading-normal tracking-wide shadow-sm">
           <span className="material-symbols-outlined text-base">add_circle</span>
-          <span className="truncate">Yeni Kasa Kaydı</span>
+          <span className="truncate">Yeni Kasa Kaydı (yakında)</span>
         </button>
       </header>
 
@@ -98,21 +49,27 @@ export const CashAccountPage = () => {
             <span className="material-symbols-outlined text-success">trending_up</span>
             <p className="text-text-light dark:text-text-dark text-base font-medium leading-normal">Toplam Gelir</p>
           </div>
-          <p className="text-text-light dark:text-text-dark tracking-tight text-3xl font-bold leading-tight">₺{currentStats.totalIncome.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-text-light dark:text-text-dark tracking-tight text-3xl font-bold leading-tight">
+            ₺{currentStats.totalIncome.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
         <div className="flex flex-col gap-2 rounded-xl p-6 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-danger">trending_down</span>
             <p className="text-text-light dark:text-text-dark text-base font-medium leading-normal">Toplam Gider</p>
           </div>
-          <p className="text-text-light dark:text-text-dark tracking-tight text-3xl font-bold leading-tight">₺{currentStats.totalExpense.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-text-light dark:text-text-dark tracking-tight text-3xl font-bold leading-tight">
+            ₺{currentStats.totalExpense.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
         <div className="flex flex-col gap-2 rounded-xl p-6 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
             <p className="text-text-light dark:text-text-dark text-base font-medium leading-normal">Net Durum</p>
           </div>
-          <p className="text-text-light dark:text-text-dark tracking-tight text-3xl font-bold leading-tight">₺{currentStats.netBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-text-light dark:text-text-dark tracking-tight text-3xl font-bold leading-tight">
+            ₺{currentStats.netBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
       </section>
 
@@ -121,29 +78,33 @@ export const CashAccountPage = () => {
         <div className="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             <label className="flex flex-col">
-              <p className="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Başlangıç Tarihi</p>
-              <input 
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 text-sm font-normal leading-normal" 
-                type="date" 
+              <p className="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">
+                Başlangıç Tarihi
+              </p>
+              <input
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 text-sm font-normal leading-normal"
+                type="date"
                 value={filters.startDate}
-                onChange={(e) => setFilters({...filters, startDate: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
               />
             </label>
             <label className="flex flex-col">
-              <p className="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Bitiş Tarihi</p>
-              <input 
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 text-sm font-normal leading-normal" 
-                type="date" 
+              <p className="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">
+                Bitiş Tarihi
+              </p>
+              <input
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 text-sm font-normal leading-normal"
+                type="date"
                 value={filters.endDate}
-                onChange={(e) => setFilters({...filters, endDate: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               />
             </label>
             <label className="flex flex-col">
               <p className="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Tür</p>
-              <select 
+              <select
                 className="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 px-3 text-sm font-normal leading-normal"
                 value={filters.type}
-                onChange={(e) => setFilters({...filters, type: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
               >
                 <option value="all">Tümü</option>
                 <option value="income">Gelir</option>
@@ -152,12 +113,12 @@ export const CashAccountPage = () => {
             </label>
             <label className="flex flex-col">
               <p className="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Dosya</p>
-              <input 
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 text-sm font-normal leading-normal" 
-                type="text" 
+              <input
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-11 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 text-sm font-normal leading-normal"
+                type="text"
                 placeholder="Dosya adı veya no..."
                 value={filters.caseSearch}
-                onChange={(e) => setFilters({...filters, caseSearch: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, caseSearch: e.target.value })}
               />
             </label>
             <div className="flex items-end gap-2 pt-1 md:col-span-2 lg:col-span-4 xl:col-span-1">
@@ -175,60 +136,76 @@ export const CashAccountPage = () => {
       {/* Data Table */}
       <section>
         <div className="overflow-x-auto rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/50">
+          <table className="min-w-full divide-y divide-border-light dark:divide-border-dark">
+            <thead className="bg-background-light dark:bg-background-dark">
               <tr>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark" scope="col">Tarih</th>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark" scope="col">Dosya</th>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark" scope="col">Müvekkil</th>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark" scope="col">Tür</th>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark" scope="col">Kategori</th>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark text-right" scope="col">Tutar</th>
-                <th className="px-6 py-4 font-semibold text-text-light dark:text-text-dark" scope="col">Açıklama</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
+                  Tarih
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
+                  Dosya
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
+                  Müvekkil
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
+                  Tür
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
+                  Kategori
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
+                  Tutar
+                </th>
               </tr>
             </thead>
-            <tbody>
-              {currentTransactions.map((transaction: CashTransaction, index: number) => (
-                <tr key={transaction.id} className={`border-b border-border-light dark:border-border-dark transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${index === currentTransactions.length - 1 ? 'border-b-0' : ''}`}>
-                  <td className="whitespace-nowrap px-6 py-4">{transaction.date}</td>
-                  <td className="whitespace-nowrap px-6 py-4 font-medium">{transaction.caseNumber}</td>
-                  <td className="whitespace-nowrap px-6 py-4">{transaction.clientName}</td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      transaction.type === 'income' 
-                        ? 'bg-success/10 text-success' 
-                        : 'bg-danger/10 text-danger'
-                    }`}>
-                      {transaction.type === 'income' ? 'Gelir' : 'Gider'}
-                    </span>
+            <tbody className="divide-y divide-border-light dark:divide-border-dark">
+              {currentTransactions.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-6 py-6 text-center text-sm text-text-secondary-light dark:text-text-secondary-dark"
+                  >
+                    Henüz kasa hareketi bulunmuyor.
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4">{transaction.category}</td>
-                  <td className="whitespace-nowrap px-6 py-4 font-semibold text-right">₺{transaction.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-6 py-4 max-w-xs truncate">{transaction.description}</td>
                 </tr>
-              ))}
+              ) : (
+                currentTransactions.map((transaction) => (
+                  <tr key={transaction.id}>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-text-light dark:text-text-dark">
+                      {transaction.date}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-text-light dark:text-text-dark">
+                      {transaction.caseNumber ?? '-'}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-text-light dark:text-text-dark">
+                      {transaction.clientName ?? '-'}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm">
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                          transaction.type === 'income'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-rose-50 text-rose-700'
+                        }`}
+                      >
+                        {transaction.type === 'income' ? 'Gelir' : 'Gider'}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-text-light dark:text-text-dark">
+                      {transaction.category}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 font-semibold text-right">
+                      ₺{transaction.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-          
-          {/* Pagination */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-4">
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Toplam 125 kayıttan 1-5 arası gösteriliyor</p>
-            <div className="flex items-center gap-2">
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark text-text-secondary-light dark:text-text-secondary-dark transition-colors hover:bg-black/5 dark:hover:bg-white/5">
-                <span className="material-symbols-outlined text-base">chevron_left</span>
-              </button>
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-primary text-sm font-semibold text-white">1</button>
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark text-sm text-text-secondary-light dark:text-text-secondary-dark transition-colors hover:bg-black/5 dark:hover:bg-white/5">2</button>
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark text-sm text-text-secondary-light dark:text-text-secondary-dark transition-colors hover:bg-black/5 dark:hover:bg-white/5">3</button>
-              <span className="text-text-secondary-light dark:text-text-secondary-dark">...</span>
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark text-sm text-text-secondary-light dark:text-text-secondary-dark transition-colors hover:bg-black/5 dark:hover:bg-white/5">25</button>
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark text-text-secondary-light dark:text-text-secondary-dark transition-colors hover:bg-black/5 dark:hover:bg-white/5">
-                <span className="material-symbols-outlined text-base">chevron_right</span>
-              </button>
-            </div>
-          </div>
         </div>
       </section>
     </div>
   );
 };
+
