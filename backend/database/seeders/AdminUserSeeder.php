@@ -9,7 +9,7 @@ use App\Models\User;
 class AdminUserSeeder
 {
     private const NAME = 'Ali Haydar Aslim';
-    private const EMAIL = 'alihaydraslim@gmail.com';
+    private const EMAIL = 'alihaydaraslim@gmail.com';
     private const PASSWORD = 'test123456';
 
     public function run(): void
@@ -20,10 +20,6 @@ class AdminUserSeeder
 
         $user->name = self::NAME;
         $user->password = $hashedPassword;
-        if (!isset($user->phone)) {
-            $user->phone = null;
-        }
-
         // ensure not soft-deleted
         if (isset($user->deleted_at)) {
             $user->deleted_at = null;
