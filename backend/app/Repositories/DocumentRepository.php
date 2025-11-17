@@ -22,8 +22,15 @@ class DocumentRepository extends BaseRepository
 
     public function search(string $term)
     {
+        // Shared hosting ortaminda FULLTEXT indeksleri veya destekli engine
+        // olmayabilecegi icin, burada whereFullText yerine LIKE tabanli
+        // daha genis uyumlu bir arama kullaniliyor.
         return $this->model->newQuery()
-            ->whereFullText(['title', 'content'], $term)
+            ->where(function ($query) use ($term) {
+                $like = '%' . $term . '%';
+                $query->where('title', 'LIKE', $like)
+                    ->orWhere('content', 'LIKE', $like);
+            })
             ->with('versions')
             ->paginate(25);
     }
