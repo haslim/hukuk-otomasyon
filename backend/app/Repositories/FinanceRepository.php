@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\FinanceTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Database\QueryException;
 
 class FinanceRepository extends BaseRepository
 {
@@ -15,53 +16,81 @@ class FinanceRepository extends BaseRepository
 
     public function monthlySummary(int $year, int $month): Collection
     {
-        return $this->model->newQuery()
-            ->selectRaw('type, SUM(amount) as total')
-            ->whereYear('occurred_on', $year)
-            ->whereMonth('occurred_on', $month)
-            ->groupBy('type')
-            ->get();
+        try {
+            return $this->model->newQuery()
+                ->selectRaw('type, SUM(amount) as total')
+                ->whereYear('occurred_on', $year)
+                ->whereMonth('occurred_on', $month)
+                ->groupBy('type')
+                ->get();
+        } catch (QueryException $e) {
+            if (str_contains($e->getMessage(), 'finance_transactions')) {
+                return collect();
+            }
+            throw $e;
+        }
     }
 
     public function getCashStats(): array
     {
         $now = Carbon::now();
-        
-        $totalIncome = $this->model->newQuery()
-            ->where('type', 'income')
-            ->sum('amount');
-            
-        $totalExpense = $this->model->newQuery()
-            ->where('type', 'expense')
-            ->sum('amount');
-            
-        $currentMonthIncome = $this->model->newQuery()
-            ->where('type', 'income')
-            ->whereYear('occurred_on', $now->year)
-            ->whereMonth('occurred_on', $now->month)
-            ->sum('amount');
-            
-        $currentMonthExpense = $this->model->newQuery()
-            ->where('type', 'expense')
-            ->whereYear('occurred_on', $now->year)
-            ->whereMonth('occurred_on', $now->month)
-            ->sum('amount');
 
-        return [
-            'total_income' => $totalIncome,
-            'total_expense' => $totalExpense,
-            'net_balance' => $totalIncome - $totalExpense,
-            'current_month_income' => $currentMonthIncome,
-            'current_month_expense' => $currentMonthExpense,
-            'current_month_net' => $currentMonthIncome - $currentMonthExpense,
-        ];
+        try {
+            $totalIncome = $this->model->newQuery()
+                ->where('type', 'income')
+                ->sum('amount');
+
+            $totalExpense = $this->model->newQuery()
+                ->where('type', 'expense')
+                ->sum('amount');
+
+            $currentMonthIncome = $this->model->newQuery()
+                ->where('type', 'income')
+                ->whereYear('occurred_on', $now->year)
+                ->whereMonth('occurred_on', $now->month)
+                ->sum('amount');
+
+            $currentMonthExpense = $this->model->newQuery()
+                ->where('type', 'expense')
+                ->whereYear('occurred_on', $now->year)
+                ->whereMonth('occurred_on', $now->month)
+                ->sum('amount');
+
+            return [
+                'total_income' => $totalIncome,
+                'total_expense' => $totalExpense,
+                'net_balance' => $totalIncome - $totalExpense,
+                'current_month_income' => $currentMonthIncome,
+                'current_month_expense' => $currentMonthExpense,
+                'current_month_net' => $currentMonthIncome - $currentMonthExpense,
+            ];
+        } catch (QueryException $e) {
+            if (str_contains($e->getMessage(), 'finance_transactions')) {
+                return [
+                    'total_income' => 0.0,
+                    'total_expense' => 0.0,
+                    'net_balance' => 0.0,
+                    'current_month_income' => 0.0,
+                    'current_month_expense' => 0.0,
+                    'current_month_net' => 0.0,
+                ];
+            }
+            throw $e;
+        }
     }
 
     public function getCashTransactions(int $limit = 50): Collection
     {
-        return $this->model->newQuery()
-            ->orderBy('occurred_on', 'desc')
-            ->limit($limit)
-            ->get();
+        try {
+            return $this->model->newQuery()
+                ->orderBy('occurred_on', 'desc')
+                ->limit($limit)
+                ->get();
+        } catch (QueryException $e) {
+            if (str_contains($e->getMessage(), 'finance_transactions')) {
+                return collect();
+            }
+            throw $e;
+        }
     }
 }
