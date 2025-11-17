@@ -16,7 +16,14 @@ class User extends BaseModel
 
     public function hasPermission(string $permission): bool
     {
-        $rolePermissions = $this->roles()->with('permissions')->get()
+        $roles = $this->roles()->with('permissions')->get();
+
+        // Administrator rolüne sahip olan herkes tüm izinlere sahiptir
+        if ($roles->pluck('key')->contains('administrator')) {
+            return true;
+        }
+
+        $rolePermissions = $roles
             ->flatMap(fn ($role) => $role->permissions)
             ->pluck('key')
             ->all();
