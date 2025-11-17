@@ -110,7 +110,8 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./frontend/dist/
-        server-dir: frontend/
+        # Deploy built frontend directly to the domain root
+        server-dir: ./
         exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
 
   test-backend:
