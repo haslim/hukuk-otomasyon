@@ -21,33 +21,51 @@ class AuthMiddleware implements MiddlewareInterface
 
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        $header = $request->getHeaderLine('Authorization');
-        if ($header === '' && isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            $header = $_SERVER['HTTP_AUTHORIZATION'];
+        // Multiple ways to get Authorization header
+        $header = $request->getHeaderLine("Authorization");
+        if (empty($header) && isset($_SERVER["HTTP_AUTHORIZATION"])) {
+            $header = $_SERVER["HTTP_AUTHORIZATION"];
         }
-        if ($header === '' && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-            $header = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+        if (empty($header) && isset($_SERVER["REDIRECT_HTTP_AUTHORIZATION"])) {
+            $header = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
         }
 
-        if (!str_starts_with($header, 'Bearer ')) {
-            return $this->unauthorized();
+        if (empty($header)) {
+            return $this->unauthorized("Missing Authorization header");
+        }
+
+        if (!str_starts_with($header, "Bearer ")) {
+            return $this->unauthorized("Invalid token format. Expected: Bearer <token>");
         }
 
         $token = substr($header, 7);
+        
+        // Check if JWT_SECRET is set
+        if (empty($_ENV["JWT_SECRET"])) {
+            error_log("JWT_SECRET is not set in environment");
+            return $this->unauthorized("Server configuration error");
+        }
+
         $user = $this->authService->validate($token);
         if (!$user) {
-            return $this->unauthorized();
+            error_log("Token validation failed for token: " . substr($token, 0, 20) . "...");
+            return $this->unauthorized("Invalid or expired token");
         }
 
         AuthContext::setUser($user);
         return $handler->handle($request);
     }
 
-    private function unauthorized(): Response
+    private function unauthorized(string $message = "Unauthorized"): Response
     {
+        error_log("Authentication failed: " . $message);
         $responseFactory = AppFactory::determineResponseFactory();
         $response = $responseFactory->createResponse(401);
-        $response->getBody()->write(json_encode(['message' => 'Unauthorized']));
-        return $response->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write(json_encode([
+            "message" => $message,
+            "timestamp" => time(),
+            "path" => $_SERVER["REQUEST_URI"] ?? "unknown"
+        ]));
+        return $response->withHeader("Content-Type", "application/json");
     }
 }
