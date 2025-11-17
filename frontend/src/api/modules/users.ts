@@ -76,21 +76,23 @@ export const RolesApi = {
           ? rawData.roles
           : [];
 
-      return raw.map(
-        (role): Role => ({
-          id: String(role.id),
-          name: role.name ?? '',
-          permissions: ((role.permissions ?? []) as any[]).map(
-            (perm, index): Permission => ({
-              id: String(perm.id ?? `${role.id}-${index}`),
-              name: perm.name ?? perm.key ?? '',
-              code: perm.key ?? perm.code ?? '',
-              description: perm.description ?? '',
-              enabled: true,
-            }),
-          ),
-        }),
-      );
+      return raw
+        .filter((role: any) => role && typeof role === 'object')
+        .map(
+          (role): Role => ({
+            id: String(role.id),
+            name: role.name ?? '',
+            permissions: (Array.isArray(role.permissions) ? role.permissions : []).map(
+              (perm: any, index: number): Permission => ({
+                id: String(perm.id ?? `${role.id}-${index}`),
+                name: perm.name ?? perm.key ?? '',
+                code: perm.key ?? perm.code ?? '',
+                description: perm.description ?? '',
+                enabled: true,
+              }),
+            ),
+          }),
+        );
     }),
   
   getRoleById: (id: string) => apiClient.get(`/roles/${id}`).then((res: any) => res.data),
