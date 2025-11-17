@@ -33,9 +33,9 @@ try {
     } else {
         echo "✅ Users table: EXISTS\n";
         
-        // Check for admin user
-        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE email LIKE '%admin%'");
-        $stmt->execute();
+        // Check for specific admin user
+        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM users WHERE email = ?");
+        $stmt->execute(["alihaydaraslim@gmail.com"]);
         $adminCount = $stmt->fetch(PDO::FETCH_ASSOC)["count"];
         
         if ($adminCount === 0) {
@@ -52,7 +52,13 @@ try {
             
             echo "✅ Created admin user: alihaydaraslim@gmail.com / test123456\n";
         } else {
-            echo "✅ Admin user: EXISTS\n";
+            echo "✅ Admin user already exists: alihaydaraslim@gmail.com\n";
+            
+            // Optional: Update the password to ensure it's test123456
+            $stmt = $pdo->prepare("UPDATE users SET password = ?, updated_at = NOW() WHERE email = ?");
+            $hashedPassword = password_hash("test123456", PASSWORD_DEFAULT);
+            $stmt->execute([$hashedPassword, "alihaydaraslim@gmail.com"]);
+            echo "✅ Updated admin password to: test123456\n";
         }
     }
     
