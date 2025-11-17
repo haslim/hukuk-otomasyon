@@ -67,7 +67,26 @@ export const UsersApi = {
 };
 
 export const RolesApi = {
-  getRoles: () => apiClient.get('/roles').then((res: any) => res.data),
+  getRoles: () =>
+    apiClient.get('/roles').then((res: any) => {
+      const raw = (res.data ?? []) as any[];
+
+      return raw.map(
+        (role): Role => ({
+          id: String(role.id),
+          name: role.name ?? '',
+          permissions: ((role.permissions ?? []) as any[]).map(
+            (perm, index): Permission => ({
+              id: String(perm.id ?? `${role.id}-${index}`),
+              name: perm.name ?? perm.key ?? '',
+              code: perm.key ?? perm.code ?? '',
+              description: perm.description ?? '',
+              enabled: true,
+            }),
+          ),
+        }),
+      );
+    }),
   
   getRoleById: (id: string) => apiClient.get(`/roles/${id}`).then((res: any) => res.data),
   
