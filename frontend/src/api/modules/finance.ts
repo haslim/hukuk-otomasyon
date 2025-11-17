@@ -17,6 +17,14 @@ export interface CashTransaction {
   description: string;
 }
 
+export interface CreateCashTransactionRequest {
+  type: 'income' | 'expense';
+  amount: number;
+  occurredOn: string;
+  description?: string;
+  caseId?: string;
+}
+
 export const FinanceApi = {
   cashFlow: () => apiClient.get('/finance/cash-flow').then((res: any) => res.data),
   getCashStats: () =>
@@ -44,4 +52,18 @@ export const FinanceApi = {
         }),
       );
     }),
+  createCashTransaction: (payload: CreateCashTransactionRequest) => {
+    const body: any = {
+      type: payload.type,
+      amount: payload.amount,
+      occurred_on: payload.occurredOn,
+      description: payload.description ?? '',
+    };
+
+    if (payload.caseId) {
+      body.case_id = payload.caseId;
+    }
+
+    return apiClient.post('/finance/transactions', body).then((res: any) => res.data);
+  },
 };

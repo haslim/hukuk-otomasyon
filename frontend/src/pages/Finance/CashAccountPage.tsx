@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FinanceApi, CashTransaction, CashStats } from '../../api/modules/finance';
+import { FinanceApi, CashTransaction, CashStats, CreateCashTransactionRequest } from '../../api/modules/finance';
 import { useAsyncData } from '../../hooks/useAsyncData';
 
 export const CashAccountPage = () => {
@@ -9,12 +9,27 @@ export const CashAccountPage = () => {
     type: 'all',
     caseSearch: '',
   });
+  const [showCreate, setShowCreate] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [form, setForm] = useState<CreateCashTransactionRequest>({
+    type: 'income',
+    amount: 0,
+    occurredOn: new Date().toISOString().slice(0, 10),
+    description: '',
+  });
 
-  const { data: stats, isLoading: statsLoading } = useAsyncData(['cash-stats'], FinanceApi.getCashStats);
-  const { data: transactions, isLoading: transactionsLoading } = useAsyncData(
-    ['cash-transactions'],
-    FinanceApi.getCashTransactions,
-  );
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    refetch: refetchStats,
+  } = useAsyncData(['cash-stats'], FinanceApi.getCashStats);
+
+  const {
+    data: transactions,
+    isLoading: transactionsLoading,
+    refetch: refetchTransactions,
+  } = useAsyncData(['cash-transactions'], FinanceApi.getCashTransactions);
 
   if (statsLoading || transactionsLoading) return <p>Kasa bilgileri yükleniyor...</p>;
 
@@ -26,21 +41,134 @@ export const CashAccountPage = () => {
 
   const currentTransactions: CashTransaction[] = transactions ?? [];
 
+  const handleCreate = async () => {
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+      await FinanceApi.createCashTransaction(form);
+      await Promise.all([refetchStats(), refetchTransactions()]);
+      setShowCreate(false);
+      setForm({
+        type: 'income',
+        amount: 0,
+        occurredOn: new Date().toISOString().slice(0, 10),
+        description: '',
+      });
+    } catch (error) {
+      setSaveError('Kasa kaydı oluşturulurken bir hata oluştu.');
+      // eslint-disable-next-line no-console
+      console.error('Error creating cash transaction', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       {/* PageHeading */}
-      <header className="flex flex-wrap items-center justify-between gap-4 pb-8">
+      <header className="flex flex-wrap items-center justify-between gap-4 pb-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-text-light dark:text-text-dark text-3xl font-bold leading-tight tracking-tight">Kasa</h1>
           <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">
             Tüm finansal gelir ve gider kayıtlarınızı yönetin.
           </p>
         </div>
-        <button className="flex min-w-[84px] cursor-not-allowed items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-300 text-gray-500 text-sm font-bold leading-normal tracking-wide shadow-sm">
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="flex min-w-[140px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90"
+        >
           <span className="material-symbols-outlined text-base">add_circle</span>
-          <span className="truncate">Yeni Kasa Kaydı (yakında)</span>
+          <span className="truncate">Yeni Kasa Kaydı</span>
         </button>
       </header>
+
+      {showCreate && (
+        <section className="mb-6">
+          <div className="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-text-light dark:text-text-dark">Yeni Kasa Kaydı</h2>
+                <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                  Gelir veya gider kaydı ekleyin.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreate(false)}
+                className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light"
+              >
+                Kapat
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-text-light dark:text-text-dark">Tarih</span>
+                <input
+                  type="date"
+                  className="form-input h-10 rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-3 text-sm text-text-light dark:text-text-dark"
+                  value={form.occurredOn}
+                  onChange={(e) => setForm({ ...form, occurredOn: e.target.value })}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-text-light dark:text-text-dark">Tür</span>
+                <select
+                  className="form-select h-10 rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-3 text-sm text-text-light dark:text-text-dark"
+                  value={form.type}
+                  onChange={(e) =>
+                    setForm({ ...form, type: e.target.value === 'expense' ? 'expense' : 'income' })
+                  }
+                >
+                  <option value="income">Gelir</option>
+                  <option value="expense">Gider</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-text-light dark:text-text-dark">Tutar</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="form-input h-10 rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-3 text-sm text-text-light dark:text-text-dark"
+                  value={form.amount}
+                  onChange={(e) => setForm({ ...form, amount: Number(e.target.value) || 0 })}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm md:col-span-1">
+                <span className="text-text-light dark:text-text-dark">Açıklama</span>
+                <input
+                  type="text"
+                  className="form-input h-10 rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-3 text-sm text-text-light dark:text-text-dark"
+                  placeholder="Kısa açıklama..."
+                  value={form.description ?? ''}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
+              </label>
+            </div>
+            {saveError && <p className="text-xs text-red-500">{saveError}</p>}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowCreate(false)}
+                className="rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-4 py-2 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark"
+              >
+                İptal
+              </button>
+              <button
+                type="button"
+                onClick={handleCreate}
+                disabled={isSaving || form.amount <= 0}
+                className={`rounded-lg px-4 py-2 text-xs font-semibold text-white ${
+                  isSaving || form.amount <= 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-primary/90'
+                }`}
+              >
+                {isSaving ? 'Kaydediliyor...' : 'Kaydı Oluştur'}
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Stats */}
       <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-8">
