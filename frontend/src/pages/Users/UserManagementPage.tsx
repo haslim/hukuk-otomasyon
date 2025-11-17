@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { UsersApi, User } from '../../api/modules/users';
+import { useMemo, useState } from 'react';
+import { UsersApi, User, RolesApi, Role } from '../../api/modules/users';
 import { useAsyncData } from '../../hooks/useAsyncData';
 import { UsersSectionLayout } from './UsersSectionLayout';
 
@@ -12,9 +12,9 @@ export const UserManagementPage = () => {
     roles: [] as string[],
     status: 'active' as 'active' | 'inactive',
   });
-  const { data: usersData, isLoading } = useAsyncData(['users'], UsersApi.getUsers);
 
-  if (isLoading) return <p className="p-8 text-sm text-gray-500">Kullanıcılar yükleniyor...</p>;
+  const { data: usersData, isLoading } = useAsyncData<User[]>(['users'], UsersApi.getUsers);
+  const { data: rolesData } = useAsyncData<Role[]>(['roles'], RolesApi.getRoles);
 
   const defaultUsers: User[] = [
     {
@@ -24,50 +24,31 @@ export const UserManagementPage = () => {
       status: 'active',
       roles: ['Avukat', 'Yönetici'],
     },
-    {
-      id: '2',
-      fullName: 'Ayşe Kaya',
-      email: 'ayse.kaya@bgaofis.com',
-      status: 'active',
-      roles: ['Asistan'],
-    },
-    {
-      id: '3',
-      fullName: 'Mehmet Öztürk',
-      email: 'mehmet.ozturk@bgaofis.com',
-      status: 'inactive',
-      roles: ['Stajyer'],
-    },
-    {
-      id: '4',
-      fullName: 'Fatma Demir',
-      email: 'fatma.demir@bgaofis.com',
-      status: 'active',
-      roles: ['Muhasebe'],
-    },
   ];
 
   const users = usersData || defaultUsers;
 
+  const availableRoles = useMemo(
+    () => (rolesData ?? []).map((role) => ({ id: role.id, name: role.name })),
+    [rolesData],
+  );
+
   const getStatusBadge = (status: 'active' | 'inactive') => {
-    switch (status) {
-      case 'active':
-        return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-            <span className="size-2 rounded-full bg-green-500" aria-hidden />
-            Aktif
-          </span>
-        );
-      case 'inactive':
-        return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
-            <span className="size-2 rounded-full bg-gray-500" aria-hidden />
-            Pasif
-          </span>
-        );
-      default:
-        return null;
+    if (status === 'active') {
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+          <span className="size-2 rounded-full bg-green-500" aria-hidden />
+          Aktif
+        </span>
+      );
     }
+
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+        <span className="size-2 rounded-full bg-gray-500" aria-hidden />
+        Pasif
+      </span>
+    );
   };
 
   const getRoleBadge = (role: string) => (
@@ -80,16 +61,20 @@ export const UserManagementPage = () => {
     console.log('Edit user:', userId);
   };
 
-  const handleAddUser = () => {
-    console.log('Add new user with data:', formData);
-    setIsModalOpen(false);
-    setFormData({
-      fullName: '',
-      email: '',
-      password: '',
-      roles: [],
-      status: 'active',
-    });
+  const handleAddUser = async () => {
+    try {
+      await UsersApi.createUser(formData);
+      setIsModalOpen(false);
+      setFormData({
+        fullName: '',
+        email: '',
+        password: '',
+        roles: [],
+        status: 'active',
+      });
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
   };
 
   return (
@@ -110,22 +95,35 @@ export const UserManagementPage = () => {
             Yeni Kullanıcı Ekle
           </button>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm mt-6">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Ad Soyad</th>
-                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">E-posta</th>
-                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Durum</th>
-                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Roller</th>
-                  <th className="px-6 py-3 text-right font-medium text-gray-600 uppercase tracking-wider">İşlemler</th>
+                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
+                    Ad Soyad
+                  </th>
+                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
+                    E-posta
+                  </th>
+                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
+                    Durum
+                  </th>
+                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
+                    Roller
+                  </th>
+                  <th className="px-6 py-3 text-right font-medium text-gray-600 uppercase tracking-wider">
+                    İşlemler
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {users.map((user: User) => (
                   <tr key={user.id}>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{user.fullName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                      {user.fullName}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">{user.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(user.status)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -206,10 +204,12 @@ export const UserManagementPage = () => {
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="••••••••"
+                  placeholder="Varsayılan şifreyi kullanmak için boş bırakın"
                   className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-                <p className="text-xs text-gray-500 mt-1">Boş bırakmak varsayılan şifre bırakır.</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Boş bırakmak varsayılan şifreyi kullanır.
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700" htmlFor="roles">
@@ -225,11 +225,11 @@ export const UserManagementPage = () => {
                   }}
                   className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="Avukat">Avukat</option>
-                  <option value="Yönetici">Yönetici</option>
-                  <option value="Asistan">Asistan</option>
-                  <option value="Stajyer">Stajyer</option>
-                  <option value="Muhasebe">Muhasebe</option>
+                  {availableRoles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>

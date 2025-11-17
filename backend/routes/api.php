@@ -32,8 +32,19 @@ return function (App $app) {
                 $profile->put('', [ProfileController::class, 'update']);
             });
 
-            $protected->get('/users', [UserController::class, 'index']);
-            $protected->get('/roles', [UserController::class, 'roles']);
+            $protected->group('/users', function (Group $users) {
+                $users->get('', [UserController::class, 'index']);
+                $users->post('', [UserController::class, 'store']);
+                $users->get('/{id}', [UserController::class, 'show']);
+                $users->put('/{id}', [UserController::class, 'update']);
+                $users->delete('/{id}', [UserController::class, 'destroy']);
+                $users->patch('/{id}/toggle-status', [UserController::class, 'toggleStatus']);
+            })->add(new RoleMiddleware('USER_MANAGE'));
+
+            $protected->group('/roles', function (Group $roles) {
+                $roles->get('', [UserController::class, 'roles']);
+                $roles->put('/{id}/permissions', [UserController::class, 'updateRolePermissions']);
+            })->add(new RoleMiddleware('USER_MANAGE'));
 
             $protected->group('/clients', function (Group $clients) {
                 $clients->get('', [ClientController::class, 'index']);
