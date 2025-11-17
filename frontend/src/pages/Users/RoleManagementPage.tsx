@@ -100,7 +100,7 @@ export const RoleManagementPage = () => {
     const matched = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
     setCurrentRole({
       ...matched,
-      permissions: matched.permissions.map((permission: Permission) => ({ ...permission })),
+      permissions: (matched.permissions ?? []).map((permission: Permission) => ({ ...permission })),
     });
     setHasChanges(false);
   }, [roles, selectedRole]);
@@ -108,7 +108,7 @@ export const RoleManagementPage = () => {
   const handlePermissionToggle = (permissionId: string) => {
     setCurrentRole((prev) => ({
       ...prev,
-      permissions: prev.permissions.map((permission: Permission) =>
+      permissions: (prev.permissions ?? []).map((permission: Permission) =>
         permission.id === permissionId ? { ...permission, enabled: !permission.enabled } : permission
       ),
     }));
@@ -134,7 +134,7 @@ export const RoleManagementPage = () => {
     const original = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
     setCurrentRole({
       ...original,
-      permissions: original.permissions.map((permission: Permission) => ({ ...permission })),
+      permissions: (original.permissions ?? []).map((permission: Permission) => ({ ...permission })),
     });
     setHasChanges(false);
   };
@@ -166,7 +166,9 @@ export const RoleManagementPage = () => {
                   }`}
                 >
                   <span>{role.name}</span>
-                  <span className="text-xs font-normal uppercase tracking-wide text-gray-400">{role.permissions.length} yetki</span>
+                  <span className="text-xs font-normal uppercase tracking-wide text-gray-400">
+                    {(role.permissions ?? []).length} yetki
+                  </span>
                 </button>
               ))}
             </div>
