@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 const sections = [
   {
     key: 'users',
-    label: 'KullanÄ±cÄ±lar',
-    description: 'KullanÄ±cÄ± listesi & yÃ¶netimi',
+    label: 'Kullanıcılar',
+    description: 'Kullanıcı listesi ve yönetimi',
     to: '/users',
   },
   {
@@ -24,40 +24,35 @@ interface Props {
 export const UsersSectionLayout = ({ activeTab, children }: Props) => {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[220px,1fr]">
-        <nav className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="px-5 py-4 border-b border-gray-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-500">
-              YÃ¶netim
-            </p>
-            <h2 className="text-lg font-semibold text-gray-900 mt-1">KullanÄ±cÄ± BÃ¶lÃ¼mleri</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Ekranlar arasÄ±nda hÄ±zlÄ±ca geÃ§iÅŸ yapÄ±n.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 p-2">
-            {sections.map((section) => {
-              const isActive = activeTab === section.key;
-              return (
-                <Link
-                  key={section.key}
-                  to={section.to}
-                  className={`flex flex-col gap-0.5 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-primary'
-                  }`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <span>{section.label}</span>
-                  <span className="text-xs font-normal text-gray-400">{section.description}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-        <div className="space-y-6">{children}</div>
-      </div>
+      <header className="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm flex flex-col gap-1">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">
+          Kullanıcı Yönetimi
+        </p>
+        <h1 className="text-2xl font-bold text-gray-900">Kullanıcılar & Roller</h1>
+        <p className="text-sm text-gray-500">
+          Kullanıcı hesapları, roller ve yetki setleri arasında hızlıca geçiş yapın.
+        </p>
+        <div className="mt-4 inline-flex rounded-full bg-gray-100 p-1 text-sm font-medium">
+          {sections.map((section) => {
+            const isActive = activeTab === section.key;
+            return (
+              <Link
+                key={section.key}
+                to={section.to}
+                className={`px-4 py-1.5 rounded-full transition-colors ${
+                  isActive
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-gray-600 hover:text-primary'
+                }`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {section.label}
+              </Link>
+            );
+          })}
+        </div>
+      </header>
+      <main className="space-y-6">{children}</main>
     </div>
   );
 };
