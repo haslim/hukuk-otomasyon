@@ -32,7 +32,7 @@ export const UsersSectionLayout = ({ activeTab, children }: Props) => {
         <p className="text-sm text-gray-500">
           Kullanıcı hesapları, roller ve yetki setleri arasında hızlıca geçiş yapın.
         </p>
-        <div className="mt-4 inline-flex rounded-full bg-gray-100 p-1 text-sm font-medium">
+        <div className="mt-4 inline-flex rounded-full bg-gray-50 p-1 text-sm font-medium border border-gray-200">
           {sections.map((section) => {
             const isActive = activeTab === section.key;
             return (
@@ -42,7 +42,7 @@ export const UsersSectionLayout = ({ activeTab, children }: Props) => {
                 className={`px-4 py-1.5 rounded-full transition-colors ${
                   isActive
                     ? 'bg-primary text-white shadow-sm'
-                    : 'text-gray-600 hover:text-primary'
+                    : 'text-gray-700 hover:text-primary'
                 }`}
                 aria-current={isActive ? 'page' : undefined}
               >
