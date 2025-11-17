@@ -28,7 +28,9 @@ class CalendarController extends Controller
                     'caseNumber' => $caseNumber,
                     'description' => $hearing->notes ?? 'Court hearing for case ' . $caseNumber,
                 ];
-            });
+            })
+            ->values()
+            ->all();
 
         return $this->json($response, $events);
     }

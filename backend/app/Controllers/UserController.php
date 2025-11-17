@@ -57,7 +57,7 @@ class UserController extends Controller
                 'createdAt' => $role->created_at ? $role->created_at->toDateTimeString() : null,
                 'updatedAt' => $role->updated_at ? $role->updated_at->toDateTimeString() : null,
             ];
-        });
+        })->values()->all();
 
         return $this->json($response, $roles);
     }
