@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { DashboardApi } from '../../api/modules/dashboard';
 import { useAsyncData } from '../../hooks/useAsyncData';
 
@@ -28,6 +29,7 @@ const activityFeed = [
 
 export const DashboardPage = () => {
   const { data, isLoading } = useAsyncData(['dashboard'], DashboardApi.overview);
+  const navigate = useNavigate();
 
   const stats = [
     {
@@ -37,7 +39,8 @@ export const DashboardPage = () => {
       color: 'text-orange-500',
       bg: 'bg-orange-500/20',
       trend: '+2%',
-      trendDirection: 'up',
+      trendDirection: 'up' as const,
+      path: '/workflow',
     },
     {
       label: 'Yaklaşan Duruşmalar',
@@ -46,7 +49,8 @@ export const DashboardPage = () => {
       color: 'text-blue-500',
       bg: 'bg-blue-500/20',
       trend: '-1%',
-      trendDirection: 'down',
+      trendDirection: 'down' as const,
+      path: '/calendar',
     },
     {
       label: 'Kritik Süreler (7 gün)',
@@ -55,7 +59,8 @@ export const DashboardPage = () => {
       color: 'text-purple-500',
       bg: 'bg-purple-500/20',
       trend: '+5%',
-      trendDirection: 'up',
+      trendDirection: 'up' as const,
+      path: '/cases',
     },
   ];
 
@@ -80,7 +85,8 @@ export const DashboardPage = () => {
         {stats.map((stat) => (
           <article
             key={stat.label}
-            className="flex flex-col gap-2 rounded-xl p-6 border border-[#E2E8F0] bg-white"
+            className="flex flex-col gap-2 rounded-xl p-6 border border-[#E2E8F0] bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => navigate(stat.path)}
           >
             <div className="flex items-center justify-between">
               <p className="text-base font-medium">{stat.label}</p>
@@ -114,7 +120,13 @@ export const DashboardPage = () => {
         <article className="rounded-xl border border-[#E2E8F0] bg-white p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">Son Aktiviteler</h3>
-            <button className="text-sm font-semibold text-[#2463eb]">Tümünü Gör</button>
+            <button
+              type="button"
+              className="text-sm font-semibold text-[#2463eb]"
+              onClick={() => navigate('/notifications')}
+            >
+              Tümünü Gör
+            </button>
           </div>
           <div className="space-y-4">
             {activityFeed.map((activity) => (
@@ -136,16 +148,23 @@ export const DashboardPage = () => {
             ))}
           </div>
         </article>
-        <article className="rounded-xl border border-[#E2E8F0] bg-white p-6">
+        <article
+          className="rounded-xl border border-[#E2E8F0] bg-white p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => navigate('/finance/cash')}
+        >
           <h3 className="text-lg font-bold mb-4">Kasa Özeti</h3>
           <div className="space-y-4">
             <div className="rounded-lg border border-[#E2E8F0] p-4">
               <p className="text-sm text-[#A0AEC0]">Tahsilat</p>
-              <p className="text-2xl font-bold text-emerald-600">₺{cashSummary.income.toLocaleString('tr-TR')}</p>
+              <p className="text-2xl font-bold text-emerald-600">
+                ₺{cashSummary.income.toLocaleString('tr-TR')}
+              </p>
             </div>
             <div className="rounded-lg border border-[#E2E8F0] p-4">
               <p className="text-sm text-[#A0AEC0]">Gider</p>
-              <p className="text-2xl font-bold text-rose-600">₺{cashSummary.expense.toLocaleString('tr-TR')}</p>
+              <p className="text-2xl font-bold text-rose-600">
+                ₺{cashSummary.expense.toLocaleString('tr-TR')}
+              </p>
             </div>
           </div>
         </article>
@@ -153,3 +172,4 @@ export const DashboardPage = () => {
     </section>
   );
 };
+
