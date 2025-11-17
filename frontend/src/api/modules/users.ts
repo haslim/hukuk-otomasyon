@@ -69,7 +69,12 @@ export const UsersApi = {
 export const RolesApi = {
   getRoles: () =>
     apiClient.get('/roles').then((res: any) => {
-      const raw = (res.data ?? []) as any[];
+      const rawData = res.data;
+      const raw: any[] = Array.isArray(rawData)
+        ? rawData
+        : Array.isArray(rawData?.roles)
+          ? rawData.roles
+          : [];
 
       return raw.map(
         (role): Role => ({

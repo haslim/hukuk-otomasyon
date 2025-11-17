@@ -119,7 +119,10 @@ export const RoleManagementPage = () => {
     try {
       const permissionsUpdate = {
         roleId: currentRole.id,
-        permissions: currentRole.permissions.map((permission: Permission) => ({ id: permission.id, enabled: permission.enabled })),
+        permissions: (currentRole.permissions ?? []).map((permission: Permission) => ({
+          id: permission.id,
+          enabled: permission.enabled,
+        })),
       };
       await RolesApi.updateRolePermissions(currentRole.id, permissionsUpdate);
       await refetch();
@@ -181,7 +184,7 @@ export const RoleManagementPage = () => {
               </p>
             </div>
             <div className="space-y-5 p-6">
-              {currentRole.permissions.map((permission: Permission) => (
+              {(currentRole.permissions ?? []).map((permission: Permission) => (
                 <label key={permission.id} className="flex items-center gap-4">
                   <input
                     type="checkbox"
