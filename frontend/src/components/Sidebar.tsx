@@ -51,7 +51,11 @@ export const Sidebar = () => {
             to={link.to}
             className={({ isActive }) =>
               `relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                isActive ? 'bg-[#2463eb]/15 text-white' : 'hover:bg-white/5 text-[#A0AEC0]'
+                isActive
+                  ? link.to === '/users'
+                    ? 'bg-emerald-600/20 text-emerald-100'
+                    : 'bg-[#2463eb]/15 text-white'
+                  : 'hover:bg-white/5 text-[#A0AEC0]'
               }`
             }
             end={link.to === '/'}
@@ -59,16 +63,34 @@ export const Sidebar = () => {
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <span className="absolute left-0 top-1 bottom-1 w-1 rounded-r-full bg-[#2463eb]" />
+                  <span
+                    className={`absolute left-0 top-1 bottom-1 w-1 rounded-r-full ${
+                      link.to === '/users' ? 'bg-emerald-500' : 'bg-[#2463eb]'
+                    }`}
+                  />
                 )}
                 <span
                   className={`material-symbols-outlined text-base ${
-                    isActive ? 'text-white' : 'text-[#718096]'
+                    isActive
+                      ? link.to === '/users'
+                        ? 'text-emerald-400'
+                        : 'text-white'
+                      : 'text-[#718096]'
                   }`}
                 >
                   {link.icon}
                 </span>
-                <span className={isActive ? 'font-semibold text-white' : 'text-sm'}>{link.label}</span>
+                <span
+                  className={
+                    isActive
+                      ? link.to === '/users'
+                        ? 'font-semibold text-emerald-100'
+                        : 'font-semibold text-white'
+                      : 'text-sm'
+                  }
+                >
+                  {link.label}
+                </span>
               </>
             )}
           </NavLink>

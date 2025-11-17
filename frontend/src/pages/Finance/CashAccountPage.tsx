@@ -76,7 +76,7 @@ export const CashAccountPage = () => {
         <button
           type="button"
           onClick={() => setShowCreate(true)}
-          className="flex min-w-[140px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90"
+          className="flex min-w-[140px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-emerald-600 text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-emerald-700"
         >
           <span className="material-symbols-outlined text-base">add_circle</span>
           <span className="truncate">Yeni Kasa Kaydı</span>
@@ -336,4 +336,5 @@ export const CashAccountPage = () => {
     </div>
   );
 };
+
 
