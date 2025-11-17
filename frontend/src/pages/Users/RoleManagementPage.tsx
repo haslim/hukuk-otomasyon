@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RolesApi, Role } from '../../api/modules/users';
+import { RolesApi, Role, Permission } from '../../api/modules/users';
 import { useAsyncData } from '../../hooks/useAsyncData';
 import { UsersSectionLayout } from './UsersSectionLayout';
 
@@ -97,10 +97,10 @@ export const RoleManagementPage = () => {
   const roles = rolesData || defaultRoles;
 
   useEffect(() => {
-    const matched = roles.find((role) => role.id === selectedRole) ?? roles[0];
+    const matched = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
     setCurrentRole({
       ...matched,
-      permissions: matched.permissions.map((permission) => ({ ...permission })),
+      permissions: matched.permissions.map((permission: Permission) => ({ ...permission })),
     });
     setHasChanges(false);
   }, [roles, selectedRole]);
@@ -108,7 +108,7 @@ export const RoleManagementPage = () => {
   const handlePermissionToggle = (permissionId: string) => {
     setCurrentRole((prev) => ({
       ...prev,
-      permissions: prev.permissions.map((permission) =>
+      permissions: prev.permissions.map((permission: Permission) =>
         permission.id === permissionId ? { ...permission, enabled: !permission.enabled } : permission
       ),
     }));
@@ -119,7 +119,7 @@ export const RoleManagementPage = () => {
     try {
       const permissionsUpdate = {
         roleId: currentRole.id,
-        permissions: currentRole.permissions.map((permission) => ({ id: permission.id, enabled: permission.enabled })),
+        permissions: currentRole.permissions.map((permission: Permission) => ({ id: permission.id, enabled: permission.enabled })),
       };
       await RolesApi.updateRolePermissions(currentRole.id, permissionsUpdate);
       await refetch();
@@ -131,10 +131,10 @@ export const RoleManagementPage = () => {
   };
 
   const handleCancel = () => {
-    const original = roles.find((role) => role.id === selectedRole) ?? roles[0];
+    const original = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
     setCurrentRole({
       ...original,
-      permissions: original.permissions.map((permission) => ({ ...permission })),
+      permissions: original.permissions.map((permission: Permission) => ({ ...permission })),
     });
     setHasChanges(false);
   };
@@ -155,7 +155,7 @@ export const RoleManagementPage = () => {
               <p className="text-sm text-gray-500 mt-1">Bir role tıklayarak yetkilerini düzenleyin.</p>
             </div>
             <div className="flex flex-col gap-2 p-3">
-              {roles.map((role) => (
+              {roles.map((role: Role) => (
                 <button
                   key={role.id}
                   onClick={() => setSelectedRole(role.id)}
@@ -179,7 +179,7 @@ export const RoleManagementPage = () => {
               </p>
             </div>
             <div className="space-y-5 p-6">
-              {currentRole.permissions.map((permission) => (
+              {currentRole.permissions.map((permission: Permission) => (
                 <label key={permission.id} className="flex items-center gap-4">
                   <input
                     type="checkbox"
@@ -219,4 +219,3 @@ export const RoleManagementPage = () => {
     </UsersSectionLayout>
   );
 };
-

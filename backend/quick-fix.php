@@ -42,15 +42,15 @@ try {
             echo "⚠️  No admin user found. Creating one...\n";
             
             $userId = "admin-" . uniqid();
-            $hashedPassword = password_hash("admin123", PASSWORD_DEFAULT);
+            $hashedPassword = password_hash("test123456", PASSWORD_DEFAULT);
             
             $stmt = $pdo->prepare("
-                INSERT INTO users (id, email, password, name, created_at, updated_at) 
+                INSERT INTO users (id, email, password, name, created_at, updated_at)
                 VALUES (?, ?, ?, ?, NOW(), NOW())
             ");
-            $stmt->execute([$userId, "admin@bgaofis.com", $hashedPassword, "Admin User"]);
+            $stmt->execute([$userId, "alihaydaraslim@gmail.com", $hashedPassword, "Ali Haydar Aslim"]);
             
-            echo "✅ Created admin user: admin@bgaofis.com / admin123\n";
+            echo "✅ Created admin user: alihaydaraslim@gmail.com / test123456\n";
         } else {
             echo "✅ Admin user: EXISTS\n";
         }
@@ -78,5 +78,5 @@ try {
 echo "\nNext steps:\n";
 echo "1. Install pdo_mysql extension if not done\n";
 echo "2. Run database migrations: php migrate.php\n";
-echo "3. Test login: admin@bgaofis.com / admin123\n";
+echo "3. Test login: alihaydaraslim@gmail.com / test123456\n";
 echo "4. Access frontend and test authentication\n";
