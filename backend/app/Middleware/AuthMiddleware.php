@@ -22,6 +22,13 @@ class AuthMiddleware implements MiddlewareInterface
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
         $header = $request->getHeaderLine('Authorization');
+        if ($header === '' && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $header = $_SERVER['HTTP_AUTHORIZATION'];
+        }
+        if ($header === '' && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            $header = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+        }
+
         if (!str_starts_with($header, 'Bearer ')) {
             return $this->unauthorized();
         }
