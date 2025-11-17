@@ -1,4 +1,4 @@
-﻿import { defineConfig } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -16,19 +16,22 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           query: ['@tanstack/react-query'],
-          utils: ['axios', 'zustand']
-        }
-      }
+          utils: ['axios', 'zustand'],
+        },
+      },
     },
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-      }
-    }
+      },
+    },
   },
-  base: '/',
+  // Relative base so assets (CSS/JS) load correctly even when
+  // the app is deployed under a subdirectory on the host.
+  base: './',
   preview: {
     port: 4173,
-  }
+  },
 });
+
