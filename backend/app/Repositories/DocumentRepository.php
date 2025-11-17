@@ -32,6 +32,7 @@ class DocumentRepository extends BaseRepository
                     ->orWhere('content', 'LIKE', $like);
             })
             ->with('versions')
-            ->paginate(25);
+            ->limit(25)
+            ->get();
     }
 }
