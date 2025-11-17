@@ -264,9 +264,9 @@ class Controller {
     public function __construct() {
         try {
             $this->pdo = new PDO(
-                "mysql:host=" . $this->dbConfig['host'] . ";dbname=" . $this->dbConfig['dbname'] . "",
-                $this->dbConfig['user'],
-                $this->dbConfig['password'],
+                "mysql:host=" . $this->dbConfig["host"] . ";dbname=" . $this->dbConfig["dbname"],
+                $this->dbConfig["user"],
+                $this->dbConfig["password"],
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC

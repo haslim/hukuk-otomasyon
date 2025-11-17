@@ -8,8 +8,15 @@ use Slim\Factory\AppFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-if (file_exists(__DIR__ . '/../.env')) {
-    Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
+$envPath = dirname(__DIR__);
+if (file_exists($envPath . '/.env')) {
+    Dotenv::createImmutable($envPath)->safeLoad();
+}
+
+$appEnv = $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? getenv('APP_ENV') ?? 'production';
+$envFile = ".env.$appEnv";
+if ($appEnv && file_exists($envPath . '/' . $envFile)) {
+    Dotenv::createImmutable($envPath, $envFile)->safeLoad();
 }
 
 $config = require __DIR__ . '/../config/app.php';

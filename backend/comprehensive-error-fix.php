@@ -504,7 +504,8 @@ if ($httpCode === 200 && isset($loginResult["token"])) {
     echo "<p style='color: red;'>❌ Login failed: HTTP {$httpCode}</p>";
     echo "<p>Response: " . $response . "</p>";
 }
-?>';
+?>
+TESTSCRIPT;
 
 file_put_contents(__DIR__ . '/test-all-endpoints.php', $testScript);
 echo "<p style='color: green;'>✅ Comprehensive test script created</p>";
@@ -527,4 +528,3 @@ echo "<li>Verify that all endpoints return HTTP 200 status</li>";
 echo "</ol>";
 
 echo "<p style='color: blue; font-weight: bold;'>🔧 All fixes have been applied successfully!</p>";
-?>

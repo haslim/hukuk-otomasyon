@@ -305,7 +305,7 @@ echo "   Audit Logs Schema: " . (empty($issues) ? "✅ CORRECT" : "❌ NEEDS FIX
 echo "   Controllers: " . (count(array_filter($requiredControllers, 'file_exists')) === count($requiredControllers) ? "✅ ALL PRESENT" : "❌ SOME MISSING") . "\n";
 echo "   Middleware: " . (count(array_filter($requiredMiddleware, 'file_exists')) === count($requiredMiddleware) ? "✅ ALL PRESENT" : "❌ SOME MISSING") . "\n";
 echo "   Routes File: " . (file_exists($routesFile) ? "✅ EXISTS" : "❌ MISSING") . "\n";
-echo "   File Permissions: " . (count(array_filter($criticalFiles, function($filename) { return file_exists(__DIR__ . '/' . $filename); }) === count($criticalFiles) ? "✅ CHECKED" : "❌ ISSUES") . "\n";
+echo "   File Permissions: " . (count(array_filter($criticalFiles, function($filename) { return file_exists(__DIR__ . '/' . $filename); })) === count($criticalFiles) ? "✅ CHECKED" : "❌ ISSUES") . "\n";
 
 echo "\n🔧 RECOMMENDED ACTIONS:\n";
 if (!empty($issues) || !file_exists($routesFile) || count(array_filter($requiredControllers, 'file_exists')) < count($requiredControllers)) {

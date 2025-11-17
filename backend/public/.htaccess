@@ -4,6 +4,10 @@
 # Enable rewrite engine
 RewriteEngine On
 
+# Preserve Authorization headers for PHP
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 # Set the default directory index
 DirectoryIndex index.php
 
