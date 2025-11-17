@@ -16,8 +16,19 @@ class User extends BaseModel
 
     public function hasPermission(string $permission): bool
     {
-        return $this->roles()->with('permissions')->get()
+        $rolePermissions = $this->roles()->with('permissions')->get()
             ->flatMap(fn ($role) => $role->permissions)
-            ->contains(fn ($perm) => $perm->key === $permission || $perm->key === '*');
+            ->pluck('key')
+            ->all();
+
+        $tokenPermissions = (array) ($this->getAttribute('token_permissions') ?? []);
+
+        foreach (array_unique(array_merge($rolePermissions, $tokenPermissions)) as $key) {
+            if ($key === '*' || $key === $permission) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

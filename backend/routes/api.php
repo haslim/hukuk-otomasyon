@@ -7,6 +7,7 @@ use App\Controllers\DashboardController;
 use App\Controllers\DocumentController;
 use App\Controllers\FinanceController;
 use App\Controllers\NotificationController;
+use App\Controllers\CalendarController;
 use App\Controllers\SearchController;
 use App\Controllers\TaskController;
 use App\Controllers\WorkflowController;
@@ -32,6 +33,7 @@ return function (App $app) {
             });
 
             $protected->get('/users', [UserController::class, 'index']);
+            $protected->get('/roles', [UserController::class, 'roles']);
 
             $protected->group('/clients', function (Group $clients) {
                 $clients->get('', [ClientController::class, 'index']);
@@ -50,7 +52,7 @@ return function (App $app) {
                 $cases->post('/{id}/workflow', [WorkflowController::class, 'attachWorkflow']);
                 $cases->post('/{id}/documents', [DocumentController::class, 'upload']);
                 $cases->get('/{id}/documents', [DocumentController::class, 'list']);
-            })->add(new AuditLogMiddleware('case'))->add(new RoleMiddleware('CASE_VIEW_ALL'));
+            })->add(new AuditLogMiddleware('case'));
 
             $protected->group('/tasks', function (Group $tasks) {
                 $tasks->get('', [TaskController::class, 'index']);
@@ -72,10 +74,13 @@ return function (App $app) {
                 $finance->get('/cash-flow', [FinanceController::class, 'cashFlow']);
                 $finance->post('/transactions', [FinanceController::class, 'storeTransaction']);
                 $finance->get('/reports/monthly', [FinanceController::class, 'monthlyReport']);
-            })->add(new RoleMiddleware('CASH_VIEW'));
+                $finance->get('/cash-stats', [FinanceController::class, 'cashStats']);
+                $finance->get('/cash-transactions', [FinanceController::class, 'cashTransactions']);
+            });
 
             $protected->get('/search', [SearchController::class, 'globalSearch']);
             $protected->get('/workflow/templates', [WorkflowController::class, 'templates']);
+            $protected->get('/calendar/events', [CalendarController::class, 'events']);
         })->add(new AuthMiddleware());
     });
 };

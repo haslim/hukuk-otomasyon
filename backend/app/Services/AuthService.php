@@ -37,7 +37,11 @@ class AuthService
     {
         try {
             $decoded = JWT::decode($token, new Key($_ENV['JWT_SECRET'], 'HS256'));
-            return User::find($decoded->sub);
+            $user = User::find($decoded->sub);
+            if ($user && isset($decoded->permissions)) {
+                $user->setAttribute('token_permissions', (array) $decoded->permissions);
+            }
+            return $user;
         } catch (\Throwable $th) {
             return null;
         }
