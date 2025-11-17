@@ -16,15 +16,17 @@ class CalendarController extends Controller
             ->orderBy('hearing_date', 'asc')
             ->get()
             ->map(function (Hearing $hearing) {
+                $caseNumber = $hearing->case?->case_no ?? 'Unknown Case';
+
                 return [
                     'id' => $hearing->id,
-                    'title' => 'Hearing: ' . ($hearing->case->case_no ?? 'Unknown Case'),
+                    'title' => 'Hearing: ' . $caseNumber,
                     'start' => $hearing->hearing_date->toDateTimeString(),
-                    'end' => $hearing->hearing_date->addHours(1)->toDateTimeString(),
+                    'end' => $hearing->hearing_date->copy()->addHours(1)->toDateTimeString(),
                     'type' => 'hearing',
                     'caseId' => $hearing->case_id,
-                    'caseNumber' => $hearing->case->case_no ?? 'Unknown Case',
-                    'description' => $hearing->notes ?? 'Court hearing for case ' . ($hearing->case->case_no ?? 'Unknown Case'),
+                    'caseNumber' => $caseNumber,
+                    'description' => $hearing->notes ?? 'Court hearing for case ' . $caseNumber,
                 ];
             });
 
