@@ -94,7 +94,7 @@ export const RoleManagementPage = () => {
   }));
   const [hasChanges, setHasChanges] = useState(false);
   const { data: rolesData, isLoading, refetch } = useAsyncData(['roles'], RolesApi.getRoles);
-  const roles = rolesData || defaultRoles;
+  const roles = rolesData && rolesData.length ? rolesData : defaultRoles;
 
   useEffect(() => {
     const matched = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
