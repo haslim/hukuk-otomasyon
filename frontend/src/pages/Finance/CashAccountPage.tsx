@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   FinanceApi,
   CashTransaction,
@@ -49,7 +49,7 @@ export const CashAccountPage = () => {
 
   const currentTransactions: CashTransaction[] = transactions ?? [];
 
-  const filteredTransactions: CashTransaction[] = useMemo(() => {
+  const filteredTransactions: CashTransaction[] = (() => {
     const start = filters.startDate || '';
     const end = filters.endDate || '';
     const search = filters.caseSearch.trim().toLowerCase();
@@ -76,9 +76,9 @@ export const CashAccountPage = () => {
 
       return true;
     });
-  }, [currentTransactions, filters]);
+  })();
 
-  const filteredStats: CashStats = useMemo(() => {
+  const filteredStats: CashStats = (() => {
     let income = 0;
     let expense = 0;
 
@@ -92,7 +92,7 @@ export const CashAccountPage = () => {
       totalExpense: expense,
       netBalance: income - expense,
     };
-  }, [filteredTransactions]);
+  })();
 
   const handleCreate = async () => {
     try {
