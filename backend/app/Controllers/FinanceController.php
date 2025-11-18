@@ -44,7 +44,9 @@ class FinanceController extends Controller
 
     public function cashTransactions(Request $request, Response $response): Response
     {
-        $transactions = $this->financeService->cashTransactions();
+        $params = $request->getQueryParams();
+        $caseId = $params['case_id'] ?? null;
+        $transactions = $this->financeService->cashTransactions($caseId);
         return $this->json($response, $transactions);
     }
 }

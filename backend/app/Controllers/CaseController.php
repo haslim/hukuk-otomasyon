@@ -54,4 +54,11 @@ class CaseController extends Controller
         $this->service->delete($args['id']);
         return $this->json($response, ['message' => 'Removed']);
     }
+
+    public function hearings(Request $request, Response $response, array $args): Response
+    {
+        $case = $this->service->find($args['id']);
+        $hearings = $case->hearings()->orderBy('hearing_date', 'asc')->get();
+        return $this->json($response, $hearings->toArray());
+    }
 }

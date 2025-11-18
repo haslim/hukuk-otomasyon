@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { CaseApi } from '../../api/modules/cases';
 import { DocumentApi } from '../../api/modules/documents';
 import { FinanceApi } from '../../api/modules/finance';
+import { TaskApi, TaskItem } from '../../api/modules/tasks';
+import { HearingsApi, HearingItem } from '../../api/modules/hearings';
 import { useAsyncData } from '../../hooks/useAsyncData';
 
 export const CaseDetailPage = () => {
@@ -59,13 +61,26 @@ export const CaseDetailPage = () => {
     isLoading: isFinanceLoading,
   } = useAsyncData(
     ['case-finance', id],
-    () => FinanceApi.getCashTransactions(),
-    { queryKey: ['case-finance', id], enabled: activeTab === 'finance' },
+    () => FinanceApi.getCaseTransactions(id),
+    { queryKey: ['case-finance', id], enabled: activeTab === 'finance' && Boolean(id) },
   );
 
-  const caseTransactions = useMemo(
-    () => cashTransactions.filter((tx: any) => tx.caseNumber === caseNo || tx.caseNumber === title),
-    [cashTransactions, caseNo, title],
+  const {
+    data: hearings = [],
+    isLoading: isHearingsLoading,
+  } = useAsyncData<HearingItem[]>(
+    ['case-hearings', id],
+    () => HearingsApi.listByCase(id),
+    { queryKey: ['case-hearings', id], enabled: activeTab === 'hearings' && Boolean(id) },
+  );
+
+  const {
+    data: tasks = [],
+    isLoading: isTasksLoading,
+  } = useAsyncData<TaskItem[]>(
+    ['case-tasks', id],
+    () => TaskApi.listByCase(id),
+    { queryKey: ['case-tasks', id], enabled: activeTab === 'tasks' && Boolean(id) },
   );
 
   if (isLoading) {

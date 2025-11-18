@@ -31,8 +31,8 @@ class FinanceService
         return $this->finance->getCashStats();
     }
 
-    public function cashTransactions(): array
+    public function cashTransactions(?string $caseId = null): array
     {
-        return $this->finance->getCashTransactions()->toArray();
+        return $this->finance->getCashTransactions($caseId)->toArray();
     }
 }

@@ -60,6 +60,7 @@ return function (App $app) {
                 $cases->get('/{id}', [CaseController::class, 'show']);
                 $cases->put('/{id}', [CaseController::class, 'update']);
                 $cases->delete('/{id}', [CaseController::class, 'destroy']);
+                $cases->get('/{id}/hearings', [CaseController::class, 'hearings']);
                 $cases->post('/{id}/workflow', [WorkflowController::class, 'attachWorkflow']);
                 $cases->post('/{id}/documents', [DocumentController::class, 'upload']);
                 $cases->get('/{id}/documents', [DocumentController::class, 'list']);

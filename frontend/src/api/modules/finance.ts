@@ -52,6 +52,22 @@ export const FinanceApi = {
         }),
       );
     }),
+  getCaseTransactions: (caseId: string) =>
+    apiClient.get('/finance/cash-transactions', { params: { case_id: caseId } }).then((res: any) => {
+      const items = (res.data ?? []) as any[];
+      return items.map(
+        (item): CashTransaction => ({
+          id: item.id,
+          date: item.occurred_on ?? item.date ?? '',
+          caseNumber: item.case_no ?? item.caseNumber,
+          clientName: item.client_name ?? item.clientName,
+          type: item.type,
+          category: item.category ?? '',
+          amount: Number(item.amount ?? 0),
+          description: item.description ?? '',
+        }),
+      );
+    }),
   createCashTransaction: (payload: CreateCashTransactionRequest) => {
     const body: any = {
       type: payload.type,

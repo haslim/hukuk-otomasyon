@@ -89,13 +89,25 @@ class FinanceRepository extends BaseRepository
         }
     }
 
-    public function getCashTransactions(int $limit = 50): Collection
+    public function getCashTransactions(?string $caseId = null, int $limit = 50): Collection
     {
         try {
-            return $this->model->newQuery()
+            $query = $this->model->newQuery()
+                ->leftJoin('cases', 'finance_transactions.case_id', '=', 'cases.id')
+                ->leftJoin('clients', 'cases.client_id', '=', 'clients.id')
+                ->select([
+                    'finance_transactions.*',
+                    'cases.case_no',
+                    'clients.name as client_name',
+                ])
                 ->orderBy('occurred_on', 'desc')
-                ->limit($limit)
-                ->get();
+                ->limit($limit);
+
+            if (!empty($caseId)) {
+                $query->where('finance_transactions.case_id', $caseId);
+            }
+
+            return $query->get();
         } catch (QueryException $e) {
             if (str_contains($e->getMessage(), 'finance_transactions')) {
                 return collect();
