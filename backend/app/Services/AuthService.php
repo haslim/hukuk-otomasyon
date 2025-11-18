@@ -16,12 +16,18 @@ class AuthService
             return null;
         }
 
+        // Token expiration (default: 2 hours = 7200 seconds)
+        $ttl = (int) ($_ENV['JWT_EXPIRE'] ?? 7200);
+        if ($ttl <= 0) {
+            $ttl = 7200;
+        }
+
         $tokenId = Uuid::uuid4()->toString();
         $payload = [
             'iss' => 'bgaofis',
             'sub' => $user->id,
             'jti' => $tokenId,
-            'exp' => time() + 60 * 60 * 4,
+            'exp' => time() + $ttl,
             'permissions' => $user->roles()->with('permissions')->get()
                 ->flatMap(fn ($role) => $role->permissions->pluck('key'))
                 ->unique()
