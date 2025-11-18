@@ -1,9 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { DEFAULT_AVATAR_URL, useAuth } from '../../context/AuthContext';
 import { ProfileApi } from '../../api/modules/profile';
-
-const DEFAULT_AVATAR =
-  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&auto=format&fit=crop&q=80';
 
 export const ProfilePage = () => {
   const { user, setUser } = useAuth();
@@ -110,7 +107,7 @@ export const ProfilePage = () => {
           <div className="flex items-center gap-6">
             <div className="h-24 w-24 overflow-hidden rounded-full border border-white/70 shadow-sm">
               <img
-                src={user?.avatarUrl ?? DEFAULT_AVATAR}
+                src={user?.avatarUrl || DEFAULT_AVATAR_URL}
                 alt={user?.name ?? 'Profil resmi'}
                 className="h-full w-full object-cover"
               />

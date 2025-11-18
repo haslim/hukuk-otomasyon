@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
+export const DEFAULT_AVATAR_URL =
+  'https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg';
+
 export interface AuthUser {
   id: string;
   name: string;

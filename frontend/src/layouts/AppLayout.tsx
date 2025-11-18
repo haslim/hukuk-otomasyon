@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
-import { useAuth } from '../context/AuthContext';
+import { DEFAULT_AVATAR_URL, useAuth } from '../context/AuthContext';
 import { ProfileModal } from '../components/ProfileModal';
 
 const titles: Record<string, string> = {
@@ -70,13 +70,13 @@ export const AppLayout = ({ children }: Props) => {
                 onClick={() => setProfileOpen((prev) => !prev)}
                 className="flex items-center gap-3 rounded-lg px-2 py-1 hover:bg-gray-100"
               >
-                <div
-                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                  style={{
-                    backgroundImage:
-                      `url("${user?.avatarUrl || 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80'}")`,
-                  }}
-                />
+                <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 overflow-hidden">
+                  <img
+                    src={user?.avatarUrl || DEFAULT_AVATAR_URL}
+                    alt={user?.name ?? 'Profil resmi'}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
                 <div className="flex flex-col text-right">
                   <span className="text-sm font-semibold">{user?.name ?? 'Ali Haydar Aslim'}</span>
                   <span className="text-xs text-[#A0AEC0]">{user?.title ?? 'Avukat'}</span>

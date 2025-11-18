@@ -149,6 +149,7 @@ export const CashAccountPage = () => {
                   type="number"
                   min={0}
                   step="0.01"
+                  onFocus={(e) => e.target.select()}
                   className="form-input h-10 rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-3 text-sm text-text-light dark:text-text-dark"
                   value={form.amount}
                   onChange={(e) =>
@@ -412,4 +413,3 @@ export const CashAccountPage = () => {
     </div>
   );
 };
-

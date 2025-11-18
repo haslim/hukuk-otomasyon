@@ -34,10 +34,21 @@ export const UserManagementPage = () => {
 
   const users = usersData || defaultUsers;
 
-  const availableRoles = useMemo(
-    () => (rolesData ?? []).map((role) => ({ id: role.id, name: role.name })),
-    [rolesData],
-  );
+  const availableRoles = useMemo(() => {
+    const fromApi = (rolesData ?? []).map((role) => ({ id: role.id, name: role.name }));
+
+    if (fromApi.length > 0) {
+      return fromApi;
+    }
+
+    return [
+      { id: 'admin', name: 'Admin' },
+      { id: 'lawyer', name: 'Avukat' },
+      { id: 'intern', name: 'Stajyer' },
+      { id: 'assistant', name: 'Asistan' },
+      { id: 'accounting', name: 'Muhasebe' },
+    ];
+  }, [rolesData]);
 
   const getStatusBadge = (status: 'active' | 'inactive') => {
     if (status === 'active') {
@@ -302,7 +313,7 @@ export const UserManagementPage = () => {
                     );
                     setFormData({ ...formData, roles: selectedRoles });
                   }}
-                  className="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary focus:ring-primary text-sm"
+                  className="w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-primary focus:ring-primary text-sm"
                 >
                   {availableRoles.map((role) => (
                     <option key={role.id} value={role.id}>
@@ -382,4 +393,3 @@ export const UserManagementPage = () => {
     </>
   );
 };
-

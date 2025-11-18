@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AuthUser, useAuth } from '../context/AuthContext';
+import { AuthUser, DEFAULT_AVATAR_URL, useAuth } from '../context/AuthContext';
 import { ProfileApi } from '../api/modules/profile';
 
 interface Props {
@@ -14,7 +14,7 @@ export const ProfileModal = ({ open, onClose }: Props) => {
     name: user?.name ?? '',
     email: user?.email ?? '',
     title: user?.title ?? '',
-    avatarUrl: user?.avatarUrl,
+    avatarUrl: user?.avatarUrl ?? DEFAULT_AVATAR_URL,
   }));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -62,13 +62,13 @@ export const ProfileModal = ({ open, onClose }: Props) => {
         )}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex items-center gap-4">
-            <div
-              className="bg-center bg-no-repeat bg-cover rounded-full size-16"
-              style={{
-                backgroundImage:
-                  `url("${form.avatarUrl || 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&auto=format&fit=crop&q=80'}")`,
-              }}
-            />
+            <div className="bg-center bg-no-repeat bg-cover rounded-full size-16 overflow-hidden">
+              <img
+                src={form.avatarUrl || DEFAULT_AVATAR_URL}
+                alt={form.name || 'Profil resmi'}
+                className="h-full w-full object-cover"
+              />
+            </div>
             <div className="flex-1 space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 Fotoğraf URL
@@ -128,4 +128,3 @@ export const ProfileModal = ({ open, onClose }: Props) => {
     </div>
   );
 };
-
