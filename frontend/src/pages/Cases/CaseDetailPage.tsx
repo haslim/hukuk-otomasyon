@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CaseApi } from '../../api/modules/cases';
 import { DocumentApi } from '../../api/modules/documents';
-import { FinanceApi } from '../../api/modules/finance';
+import { FinanceApi, CashTransaction } from '../../api/modules/finance';
 import { TaskApi, TaskItem } from '../../api/modules/tasks';
 import { HearingsApi, HearingItem } from '../../api/modules/hearings';
 import { useAsyncData } from '../../hooks/useAsyncData';
@@ -20,7 +20,6 @@ export const CaseDetailPage = () => {
   const caseData = data ?? {};
   const clientName = caseData.client?.name ?? 'Müvekkil Belirtilmedi';
   const caseNo = caseData.case_no ?? id;
-  const title = caseData.title ?? 'Dosya Başlığı';
   const court = caseData.metadata?.court ?? 'Mahkeme bilgisi yok';
   const status = caseData.metadata?.status ?? 'Aktif';
   const responsible = caseData.metadata?.responsible ?? 'Atanmamış';
@@ -59,7 +58,7 @@ export const CaseDetailPage = () => {
   const {
     data: cashTransactions = [],
     isLoading: isFinanceLoading,
-  } = useAsyncData(
+  } = useAsyncData<CashTransaction[]>(
     ['case-finance', id],
     () => FinanceApi.getCaseTransactions(id),
     { queryKey: ['case-finance', id], enabled: activeTab === 'finance' && Boolean(id) },
@@ -190,18 +189,53 @@ export const CaseDetailPage = () => {
           {activeTab === 'hearings' && (
             <section className="rounded-xl border border-slate-200 bg-white p-6">
               <h3 className="text-lg font-semibold text-[#1A202C]">Duruşmalar</h3>
-              <p className="mt-2 text-sm text-[#4A5568]">
-                Bu sürümde duruşma listesi sadece bilgi amaçlıdır. Henüz bu dosya için duruşma eklenmemiş.
-              </p>
+              {isHearingsLoading ? (
+                <p className="mt-2 text-sm text-[#4A5568]">Duruşmalar yükleniyor...</p>
+              ) : hearings.length === 0 ? (
+                <p className="mt-2 text-sm text-[#4A5568]">Bu dosya için kayıtlı duruşma bulunmuyor.</p>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {hearings.map((h) => (
+                    <li key={h.id} className="flex items-start justify-between rounded-lg border border-slate-200 px-4 py-2">
+                      <div>
+                        <p className="text-sm font-semibold text-[#1A202C]">
+                          {h.court || 'Mahkeme bilgisi yok'}
+                        </p>
+                        <p className="text-xs text-[#718096]">{h.hearing_date}</p>
+                        {h.notes && <p className="mt-1 text-xs text-[#4A5568]">{h.notes}</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
 
           {activeTab === 'tasks' && (
             <section className="rounded-xl border border-slate-200 bg-white p-6">
               <h3 className="text-lg font-semibold text-[#1A202C]">Görevler</h3>
-              <p className="mt-2 text-sm text-[#4A5568]">
-                Görev modülü için API entegrasyonu henüz tamamlanmadı. Şimdilik görevler burada listelenmeyecek.
-              </p>
+              {isTasksLoading ? (
+                <p className="mt-2 text-sm text-[#4A5568]">Görevler yükleniyor...</p>
+              ) : tasks.length === 0 ? (
+                <p className="mt-2 text-sm text-[#4A5568]">Bu dosya için henüz görev oluşturulmamış.</p>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {tasks.map((task) => (
+                    <li
+                      key={task.id}
+                      className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-2 text-sm"
+                    >
+                      <div>
+                        <p className="font-medium text-[#1A202C]">{task.title}</p>
+                        {task.due_date && (
+                          <p className="text-xs text-[#718096]">Son tarih: {task.due_date}</p>
+                        )}
+                      </div>
+                      <span className="text-xs uppercase text-[#718096]">{task.status ?? 'open'}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
 
@@ -220,8 +254,8 @@ export const CaseDetailPage = () => {
                       className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-2"
                     >
                       <div>
-                        <p className="text-sm font-medium text-[#1A202C]">{doc.filename ?? doc.name}</p>
-                        <p className="text-xs text-[#718096]">{doc.mime_type ?? doc.type}</p>
+                        <p className="text-sm font-medium text-[#1A202C]">{doc.title ?? doc.filename ?? doc.name}</p>
+                        <p className="text-xs text-[#718096]">{doc.type ?? doc.mime_type}</p>
                       </div>
                       <span className="material-symbols-outlined text-[#A0AEC0] text-base">description</span>
                     </li>
@@ -251,13 +285,13 @@ export const CaseDetailPage = () => {
               <h3 className="text-lg font-semibold text-[#1A202C]">Kasa Hareketleri</h3>
               {isFinanceLoading ? (
                 <p className="mt-2 text-sm text-[#4A5568]">Kasa hareketleri yükleniyor...</p>
-              ) : caseTransactions.length === 0 ? (
+              ) : cashTransactions.length === 0 ? (
                 <p className="mt-2 text-sm text-[#4A5568]">
                   Bu dosya ile ilişkilendirilmiş bir kasa hareketi bulunmuyor.
                 </p>
               ) : (
                 <div className="mt-4 space-y-2">
-                  {caseTransactions.map((tx: any) => (
+                  {cashTransactions.map((tx) => (
                     <div
                       key={tx.id}
                       className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-2 text-sm"
