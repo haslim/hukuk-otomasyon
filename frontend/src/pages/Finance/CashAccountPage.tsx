@@ -7,10 +7,16 @@ import {
 } from '../../api/modules/finance';
 import { useAsyncData } from '../../hooks/useAsyncData';
 
+const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
+
 export const CashAccountPage = () => {
+  const today = new Date();
+  const previousMonth = new Date(today);
+  previousMonth.setMonth(today.getMonth() - 1);
+
   const [filters, setFilters] = useState({
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
+    startDate: formatIsoDate(previousMonth),
+    endDate: formatIsoDate(today),
     type: 'all' as 'all' | 'income' | 'expense',
     caseSearch: '',
   });
