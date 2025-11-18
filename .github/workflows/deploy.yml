@@ -115,6 +115,8 @@ jobs:
         # FTP root: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr
         # Frontend target: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/frontend
         server-dir: frontend/
+        # Clean old files (stale assets like index-CAqfrFtT.css)
+        dangerous-clean-slate: true
         exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
 
   test-backend:
