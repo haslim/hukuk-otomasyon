@@ -17,7 +17,12 @@ const links = [
   { to: '/search', label: 'Arama', icon: 'search' },
 ];
 
-export const Sidebar = () => {
+interface SidebarProps {
+  className?: string;
+  onLinkClick?: () => void;
+}
+
+export const Sidebar = ({ className = '', onLinkClick }: SidebarProps) => {
   const navigate = useNavigate();
   const { setToken } = useAuth();
 
@@ -32,7 +37,9 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="flex h-screen w-64 flex-col bg-[#1A2234] text-[#E2E8F0] p-4 sticky top-0">
+    <aside
+      className={`flex h-full w-64 flex-col bg-[#1A2234] text-[#E2E8F0] p-4 ${className}`}
+    >
       <div className="flex items-center gap-3 px-3 py-4 mb-6 border-b border-white/5">
         <div className="size-9 rounded-xl bg-[#2463eb]/10 flex items-center justify-center text-[#2463eb]">
           <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
@@ -59,6 +66,7 @@ export const Sidebar = () => {
               }`
             }
             end={link.to === '/'}
+            onClick={onLinkClick}
           >
             {({ isActive }) => (
               <>
@@ -107,4 +115,3 @@ export const Sidebar = () => {
     </aside>
   );
 };
-

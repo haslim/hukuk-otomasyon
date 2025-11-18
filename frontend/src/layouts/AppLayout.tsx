@@ -17,7 +17,7 @@ const titles: Record<string, string> = {
   '/users/roles': 'Roller & Yetkiler',
   '/mediation': 'Arabuluculuk Başvuruları',
   '/mediation/new': 'Yeni Arabuluculuk Başvurusu',
-  '/profile': 'Profilim',
+  '/profile': 'Profilim',
 };
 
 interface Props {
@@ -29,6 +29,7 @@ export const AppLayout = ({ children }: Props) => {
   const { user, logout } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const dynamicTitle = location.pathname.startsWith('/cases/')
     ? 'Dosya Detayı'
@@ -41,20 +42,29 @@ export const AppLayout = ({ children }: Props) => {
 
   return (
     <div className="relative flex min-h-screen w-full bg-[#F6F6F8] text-[#1A202C]">
-      <Sidebar />
+      <div className="hidden lg:flex lg:sticky lg:top-0 lg:h-screen">
+        <Sidebar />
+      </div>
       <main className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between border-b border-[#E2E8F0] bg-white px-8 py-4 sticky top-0 z-10">
+        <header className="flex flex-col gap-4 border-b border-[#E2E8F0] bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div>
             <h2 className="text-xl font-bold leading-tight">{pageTitle}</h2>
             <p className="text-sm text-[#A0AEC0]">BGOfis yönetim paneli</p>
           </div>
-          <div className="flex flex-1 justify-end items-center gap-4">
-            <label className="relative flex flex-col w-full max-w-xs">
+          <div className="flex w-full flex-1 flex-wrap items-center justify-end gap-3">
+            <button
+              type="button"
+              className="lg:hidden rounded-lg border border-[#E2E8F0] p-2 text-[#1A202C] hover:bg-gray-100 transition-colors"
+              onClick={() => setMobileSidebarOpen(true)}
+            >
+              <span className="material-symbols-outlined text-xl">menu</span>
+            </button>
+            <label className="relative flex flex-1 max-w-xs min-w-[220px]">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0AEC0]">
                 <span className="material-symbols-outlined text-xl">search</span>
               </div>
               <input
-                className="h-10 rounded-lg border border-[#E2E8F0] bg-white px-4 pl-10 text-sm text-[#1A202C] focus:outline-none focus:ring-2 focus:ring-[#2463eb]"
+                className="h-10 w-full rounded-lg border border-[#E2E8F0] bg-white px-4 pl-10 text-sm text-[#1A202C] focus:outline-none focus:ring-2 focus:ring-[#2463eb]"
                 placeholder="Ara..."
               />
             </label>
@@ -109,10 +119,20 @@ export const AppLayout = ({ children }: Props) => {
             </div>
           </div>
         </header>
-        <div className="flex-1 p-8 bg-[#F7FAFC]">{children}</div>
+        <div className="flex-1 p-4 sm:p-8 bg-[#F7FAFC]">{children}</div>
       </main>
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div className="relative z-10 h-full w-64 bg-transparent">
+            <Sidebar className="h-full sticky top-0" onLinkClick={() => setMobileSidebarOpen(false)} />
+          </div>
+        </div>
+      )}
       <ProfileModal open={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
     </div>
   );
-}
-
+};
