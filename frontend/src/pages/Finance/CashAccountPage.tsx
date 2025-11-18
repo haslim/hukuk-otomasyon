@@ -18,6 +18,7 @@ export const CashAccountPage = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [amountError, setAmountError] = useState<string | null>(null);
   const [form, setForm] = useState<CreateCashTransactionRequest>({
     type: 'income',
     amount: 0,
@@ -95,6 +96,10 @@ export const CashAccountPage = () => {
   })();
 
   const handleCreate = async () => {
+    if (amountError || form.amount <= 0) {
+      setSaveError('Tutar alanına geçerli bir sayı yazmalısınız.');
+      return;
+    }
     try {
       setIsSaving(true);
       setSaveError(null);
@@ -197,13 +202,25 @@ export const CashAccountPage = () => {
                   onFocus={(e) => e.target.select()}
                   className="form-input h-10 rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark px-3 text-sm text-text-light dark:text-text-dark"
                   value={form.amount}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    // Virgül ve nokta destekle
+                    const normalized = raw.replace(',', '.');
+                    const numeric = normalized === '' ? 0 : Number(normalized);
+
+                    if (raw !== '' && Number.isNaN(numeric)) {
+                      setAmountError('Tutar alanına sadece rakam yazabilirsiniz.');
+                      return;
+                    }
+
+                    setAmountError(null);
                     setForm({
                       ...form,
-                      amount: Number(e.target.value) || 0,
-                    })
-                  }
+                      amount: numeric || 0,
+                    });
+                  }}
                 />
+                {amountError && <p className="mt-1 text-xs text-red-500">{amountError}</p>}
               </label>
 
               <label className="flex flex-col gap-1 text-sm md:col-span-1">
