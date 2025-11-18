@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   FinanceApi,
   CashTransaction,
@@ -48,6 +48,51 @@ export const CashAccountPage = () => {
   };
 
   const currentTransactions: CashTransaction[] = transactions ?? [];
+
+  const filteredTransactions: CashTransaction[] = useMemo(() => {
+    const start = filters.startDate || '';
+    const end = filters.endDate || '';
+    const search = filters.caseSearch.trim().toLowerCase();
+
+    return currentTransactions.filter((tx) => {
+      const date = (tx.date ?? '').slice(0, 10);
+
+      if (start && date && date < start) return false;
+      if (end && date && date > end) return false;
+
+      if (filters.type !== 'all' && tx.type !== filters.type) return false;
+
+      if (search) {
+        const haystack = [
+          tx.caseNumber ?? '',
+          tx.clientName ?? '',
+          tx.description ?? '',
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        if (!haystack.includes(search)) return false;
+      }
+
+      return true;
+    });
+  }, [currentTransactions, filters]);
+
+  const filteredStats: CashStats = useMemo(() => {
+    let income = 0;
+    let expense = 0;
+
+    for (const tx of filteredTransactions) {
+      if (tx.type === 'income') income += tx.amount;
+      if (tx.type === 'expense') expense += tx.amount;
+    }
+
+    return {
+      totalIncome: income,
+      totalExpense: expense,
+      netBalance: income - expense,
+    };
+  }, [filteredTransactions]);
 
   const handleCreate = async () => {
     try {
@@ -303,6 +348,9 @@ export const CashAccountPage = () => {
             <div className="flex items-end gap-2 pt-1 md:col-span-2 lg:col-span-4 xl:col-span-1">
               <button
                 type="button"
+                onClick={async () => {
+                  await Promise.all([refetchStats(), refetchTransactions()]);
+                }}
                 className="flex h-11 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary/90"
               >
                 <span className="truncate">Filtrele</span>
@@ -359,7 +407,7 @@ export const CashAccountPage = () => {
               </tr>
             </thead>
             <tbody>
-              {currentTransactions.length === 0 ? (
+              {filteredTransactions.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
@@ -369,7 +417,7 @@ export const CashAccountPage = () => {
                   </td>
                 </tr>
               ) : (
-                currentTransactions.map((transaction) => (
+                filteredTransactions.map((transaction) => (
                   <tr
                     key={transaction.id}
                     className="border-b border-gray-200 dark:border-gray-700 transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
