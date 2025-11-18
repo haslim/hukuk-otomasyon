@@ -55,6 +55,8 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./backend/
+        # FTP root: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr
+        # Backend target: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/backend
         server-dir: backend/
         exclude: "**/.git* **/node_modules/** **/tests/** **/.env* **/composer.lock"
         
@@ -110,7 +112,8 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./frontend/dist/
-        # Deploy built frontend into the frontend document root
+        # FTP root: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr
+        # Frontend target: /home/haslim/public_html/bgaofis.billurguleraslim.av.tr/frontend
         server-dir: frontend/
         exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
 
