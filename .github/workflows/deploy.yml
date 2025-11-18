@@ -96,7 +96,7 @@ jobs:
     - name: Build frontend
       run: |
         cd frontend
-        npm run build
+        npm run build:prod
         
     - name: Create .htaccess for frontend
       run: |
@@ -110,8 +110,8 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./frontend/dist/
-        # Deploy built frontend directly to the domain root
-        server-dir: ./
+        # Deploy built frontend into the frontend document root
+        server-dir: frontend/
         exclude: "**/node_modules/** **/src/** **/.git* **/package*.json **/tsconfig*.json **/vite.config.*"
 
   test-backend:
