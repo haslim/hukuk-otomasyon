@@ -5,6 +5,7 @@ import { CasesPage } from '../pages/Cases/CasesPage';
 import { CaseDetailPage } from '../pages/Cases/CaseDetailPage';
 import { WorkflowPage } from '../pages/Workflow/WorkflowPage';
 import { DocumentsPage } from '../pages/Documents/DocumentsPage';
+import { DocumentTemplatesPage } from '../pages/Documents/DocumentTemplatesPage';
 import { FinancePage } from '../pages/Finance/FinancePage';
 import { CashAccountPage } from '../pages/Finance/CashAccountPage';
 import { CalendarPage } from '../pages/Calendar/CalendarPage';
@@ -25,6 +26,7 @@ export const AppRoutes = () => (
     <Route path="/cases/:id" element={<CaseDetailPage />} />
     <Route path="/workflow" element={<WorkflowPage />} />
     <Route path="/documents" element={<DocumentsPage />} />
+    <Route path="/documents/templates" element={<DocumentTemplatesPage />} />
     <Route path="/finance" element={<FinancePage />} />
     <Route path="/finance/cash" element={<CashAccountPage />} />
     <Route path="/calendar" element={<CalendarPage />} />
