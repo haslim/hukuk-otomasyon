@@ -18,11 +18,6 @@ class RoleMiddleware implements MiddlewareInterface
     {
         $user = auth();
 
-        // Admin kullanici (Ali Haydar Aslim) tum izinleri gecsin
-        if ($user && isset($user->email) && $user->email === 'alihaydaraslim@gmail.com') {
-            return $handler->handle($request);
-        }
-
         if (!$user || !$user->hasPermission($this->permission)) {
             $responseFactory = AppFactory::determineResponseFactory();
             $response = $responseFactory->createResponse(403);

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { RolesApi, Role, Permission } from '../../api/modules/users';
 import { useAsyncData } from '../../hooks/useAsyncData';
 import { UsersSectionLayout } from './UsersSectionLayout';
+import { useNotification } from '../../context/NotificationContext';
 
 const defaultRoles: Role[] = [
   {
@@ -95,6 +96,7 @@ export const RoleManagementPage = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const { data: rolesData, isLoading, refetch } = useAsyncData(['roles'], RolesApi.getRoles);
   const roles = rolesData && rolesData.length ? rolesData : defaultRoles;
+  const { notify } = useNotification();
 
   useEffect(() => {
     const matched = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
@@ -127,9 +129,10 @@ export const RoleManagementPage = () => {
       await RolesApi.updateRolePermissions(currentRole.id, permissionsUpdate);
       await refetch();
       setHasChanges(false);
-      console.log('Role permissions saved successfully:', currentRole);
+      notify('Rol izinleri başarıyla kaydedildi', 'success');
     } catch (error) {
-      console.error('Error saving role permissions:', error);
+      const message = error instanceof Error ? error.message : 'Rol izinleri kaydedilirken hata oluştu.';
+      notify(message, 'error');
     }
   };
 

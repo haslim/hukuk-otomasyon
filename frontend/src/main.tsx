@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles/index.css';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 const queryClient = new QueryClient();
 
@@ -12,9 +13,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </NotificationProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,

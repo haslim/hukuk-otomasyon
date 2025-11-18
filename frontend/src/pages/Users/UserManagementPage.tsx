@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { UsersApi, User, RolesApi, Role } from '../../api/modules/users';
 import { useAsyncData } from '../../hooks/useAsyncData';
 import { UsersSectionLayout } from './UsersSectionLayout';
+import { useNotification } from '../../context/NotificationContext';
 
 export const UserManagementPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +22,7 @@ export const UserManagementPage = () => {
     refetch: refetchUsers,
   } = useAsyncData<User[]>(['users'], UsersApi.getUsers);
   const { data: rolesData } = useAsyncData<Role[]>(['roles'], RolesApi.getRoles);
+  const { notify } = useNotification();
 
   const defaultUsers: User[] = [
     {
@@ -76,8 +78,7 @@ export const UserManagementPage = () => {
 
   const handleEditUser = (userId: string) => {
     // Düzenleme akışı daha sonra eklenecek
-    // eslint-disable-next-line no-console
-    console.log('Edit user:', userId);
+    notify('Düzenleme akışı yakında kullanıma alınacak', 'info');
   };
 
   const handleAddUser = async () => {
@@ -94,10 +95,11 @@ export const UserManagementPage = () => {
         roles: [],
         status: 'active',
       });
+      notify('Kullanıcı başarıyla oluşturuldu', 'success');
     } catch (error) {
       setSaveError('Kullanıcı oluşturulurken bir hata oluştu.');
-      // eslint-disable-next-line no-console
-      console.error('Error creating user:', error);
+      const message = error instanceof Error ? error.message : 'Kullanıcı oluşturulurken bir hata oluştu.';
+      notify(message, 'error');
     } finally {
       setIsSaving(false);
     }
