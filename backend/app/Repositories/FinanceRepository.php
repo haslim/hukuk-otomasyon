@@ -6,12 +6,22 @@ use App\Models\FinanceTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Database\QueryException;
+use Ramsey\Uuid\Uuid;
 
 class FinanceRepository extends BaseRepository
 {
     public function __construct(FinanceTransaction $model)
     {
         parent::__construct($model);
+    }
+
+    public function create(array $data)
+    {
+        if (!isset($data['id']) || empty($data['id'])) {
+            $data['id'] = Uuid::uuid4()->toString();
+        }
+
+        return $this->model->newQuery()->create($data);
     }
 
     public function monthlySummary(int $year, int $month): Collection
