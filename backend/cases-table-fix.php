@@ -63,12 +63,20 @@ try {
 
     $hasCaseNo      = false;
     $hasCaseNumber  = false;
+    $hasType        = false;
+    $hasCaseType    = false;
     foreach ($columns as $col) {
         if ($col['Field'] === 'case_no') {
             $hasCaseNo = true;
         }
         if ($col['Field'] === 'case_number') {
             $hasCaseNumber = true;
+        }
+        if ($col['Field'] === 'type') {
+            $hasType = true;
+        }
+        if ($col['Field'] === 'case_type') {
+            $hasCaseType = true;
         }
     }
 
@@ -92,6 +100,29 @@ try {
         echo " - Updated {$updated} rows from case_number to case_no.\n";
     } else {
         echo "Legacy column 'case_number' not found. Skipping data migration step.\n";
+    }
+
+    // TYPE / CASE_TYPE uyumu
+    if ($hasType) {
+        echo "Column 'type' already exists.\n";
+    } else {
+        echo "Column 'type' is missing. Adding column...\n";
+        $pdo->exec("ALTER TABLE cases ADD COLUMN type VARCHAR(100) NULL AFTER case_no");
+        echo " - Added type VARCHAR(100) column.\n";
+    }
+
+    if ($hasCaseType) {
+        echo "Found legacy column 'case_type'. Copying values into 'type' (where empty)...\n";
+        $updatedType = $pdo->exec("
+            UPDATE cases
+            SET type = case_type
+            WHERE (type IS NULL OR type = '')
+              AND case_type IS NOT NULL
+              AND case_type <> ''
+        ");
+        echo " - Updated {$updatedType} rows from case_type to type.\n";
+    } else {
+        echo "Legacy column 'case_type' not found. Skipping type data migration step.\n";
     }
 
     // UNIQUE index oluşturmaya çalış
@@ -123,4 +154,3 @@ try {
     echo "\nFATAL ERROR: " . $e->getMessage() . "\n";
     exit(1);
 }
-
