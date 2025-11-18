@@ -313,7 +313,7 @@ export const UserManagementPage = () => {
                     );
                     setFormData({ ...formData, roles: selectedRoles });
                   }}
-                  className="w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-primary focus:ring-primary text-sm"
+                  className="w-full rounded border border-gray-300 bg-white text-gray-900 shadow-sm focus:border-primary focus:ring-primary focus:outline-none text-sm"
                 >
                   {availableRoles.map((role) => (
                     <option key={role.id} value={role.id}>
