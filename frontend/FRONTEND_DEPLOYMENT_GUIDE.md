@@ -31,8 +31,8 @@ npm install
 Verify that your `.env` file contains the correct production configuration:
 
 ```env
-# API Configuration
-VITE_API_URL=https://bgaofis.billurguleraslim.av.tr/api
+# API Configuration (production)
+VITE_API_URL=https://backend.bgaofis.billurguleraslim.av.tr/api
 
 # Application Configuration
 VITE_APP_NAME="BGAofis Hukuk Otomasyon"
