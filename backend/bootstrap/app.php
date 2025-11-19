@@ -46,6 +46,20 @@ $app->options('/{routes:.+}', function (ServerRequestInterface $request, Respons
     return $response->withStatus(200);
 });
 
+// Add comprehensive CORS middleware for all requests
+$app->add(function ($request, $handler) {
+    $response = $handler->handle($request);
+    
+    // Get allowed origin from environment or allow all for development
+    $allowedOrigin = $_ENV['CORS_ORIGIN'] ?? '*';
+    
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', $allowedOrigin)
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->withHeader('Access-Control-Allow-Credentials', 'true');
+});
+
 $app->addErrorMiddleware(
     $config['debug'] ?? false,
     true,

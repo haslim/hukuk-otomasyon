@@ -1,12 +1,14 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-return new class {
-    public function up()
+return new class extends Migration
+{
+    public function up(): void
     {
-        Capsule::schema()->create('clients', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->enum('type', ['real', 'legal']);
@@ -20,7 +22,7 @@ return new class {
             $table->fullText(['name', 'identifier', 'notes']);
         });
 
-        Capsule::schema()->create('cases', function (Blueprint $table) {
+        Schema::create('cases', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('client_id');
             $table->string('case_no')->unique();
@@ -31,9 +33,10 @@ return new class {
             $table->timestamps();
             $table->softDeletes();
             $table->fullText(['title', 'subject', 'case_no']);
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
         });
 
-        Capsule::schema()->create('case_parties', function (Blueprint $table) {
+        Schema::create('case_parties', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('case_id');
             $table->string('role');
@@ -41,9 +44,10 @@ return new class {
             $table->string('identifier')->nullable();
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('case_id')->references('id')->on('cases')->onDelete('cascade');
         });
 
-        Capsule::schema()->create('hearings', function (Blueprint $table) {
+        Schema::create('hearings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('case_id');
             $table->dateTime('hearing_date');
@@ -51,9 +55,10 @@ return new class {
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('case_id')->references('id')->on('cases')->onDelete('cascade');
         });
 
-        Capsule::schema()->create('tasks', function (Blueprint $table) {
+        Schema::create('tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('case_id')->nullable();
             $table->uuid('assigned_to')->nullable();
@@ -62,15 +67,17 @@ return new class {
             $table->enum('status', ['open','in_progress','completed'])->default('open');
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('case_id')->references('id')->on('cases')->onDelete('cascade');
+            $table->foreign('assigned_to')->references('id')->on('users')->onDelete('set null');
         });
     }
 
-    public function down()
+    public function down(): void
     {
-        Capsule::schema()->dropIfExists('tasks');
-        Capsule::schema()->dropIfExists('hearings');
-        Capsule::schema()->dropIfExists('case_parties');
-        Capsule::schema()->dropIfExists('cases');
-        Capsule::schema()->dropIfExists('clients');
+        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('hearings');
+        Schema::dropIfExists('case_parties');
+        Schema::dropIfExists('cases');
+        Schema::dropIfExists('clients');
     }
 };
