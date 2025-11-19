@@ -16,11 +16,11 @@ Rol bazlı dinamik menü yönetim sistemi.
 
 ### 1. Veritabanı Migration
 
-**ÖNEMLİ:** Production ortamında `backend/menu-tables-fixed.sql` dosyasını manuel çalıştırın.
+**ÖNEMLİ:** Production ortamında `backend/menu-tables-final.sql` dosyasını manuel çalıştırın.
 
 ```sql
 -- MySQL/phpMyAdmin veya benzeri araçla bu dosyayı import edin
--- backend/menu-tables-fixed.sql
+-- backend/menu-tables-final.sql
 ```
 
 Bu dosya şunları yapar:
