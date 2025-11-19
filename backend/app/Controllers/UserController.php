@@ -74,6 +74,12 @@ class UserController extends Controller
         if (!empty($roleIds)) {
             $validRoleIds = Role::whereIn('id', $roleIds)->pluck('id')->all();
             $user->roles()->sync($validRoleIds);
+        } else {
+            // Varsayılan olarak yeni kullanıcılar için 'lawyer' rolü atanır
+            $defaultRole = Role::where('key', 'lawyer')->first();
+            if ($defaultRole) {
+                $user->roles()->attach($defaultRole->id);
+            }
         }
 
         if ($status === 'inactive') {

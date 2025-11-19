@@ -34,10 +34,13 @@ class AdminUserSeeder
 
         $permissionDefinitions = [
             '*' => 'Full system access',
+            'USER_MANAGE' => 'Manage users and roles',
             'CASE_VIEW_ALL' => 'View all cases',
             'CASH_VIEW' => 'Access finance data',
             'CALENDAR_MANAGE' => 'Manage calendar events',
-            'CLIENT_MANAGE' => 'Manage clients'
+            'CLIENT_MANAGE' => 'Manage clients',
+            'DOCUMENT_MANAGE' => 'Manage documents',
+            'NOTIFICATION_MANAGE' => 'Manage notifications'
         ];
 
         $permissionIds = [];

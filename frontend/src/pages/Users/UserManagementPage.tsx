@@ -43,12 +43,13 @@ export const UserManagementPage = () => {
       return fromApi;
     }
 
+    // Fallback roles when API doesn't return data
     return [
       { id: 'admin', name: 'Admin' },
       { id: 'lawyer', name: 'Avukat' },
-      { id: 'intern', name: 'Stajyer' },
-      { id: 'assistant', name: 'Asistan' },
       { id: 'accounting', name: 'Muhasebe' },
+      { id: 'secretary', name: 'Sekreter' },
+      { id: 'intern', name: 'Stajyer' },
     ];
   }, [rolesData]);
 

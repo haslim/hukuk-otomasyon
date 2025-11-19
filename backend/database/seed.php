@@ -2,10 +2,12 @@
 
 require_once __DIR__ . '/../bootstrap/app.php';
 
+use Database\Seeders\RoleSeeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\WorkflowTemplateSeeder;
 
 $seeders = [
+    RoleSeeder::class,
     AdminUserSeeder::class,
     WorkflowTemplateSeeder::class,
 ];
