@@ -2,6 +2,7 @@
 
 namespace App\Services\Workflow;
 
+use App\Models\WorkflowStep;
 use App\Repositories\WorkflowRepository;
 use InvalidArgumentException;
 
@@ -38,6 +39,7 @@ class WorkflowService
 
         $rawSteps = $data['steps'] ?? [];
         $steps = [];
+        $hasOrderColumn = WorkflowStep::hasOrderColumn();
 
         foreach ($rawSteps as $step) {
             $title = trim((string) ($step['title'] ?? ''));
@@ -45,11 +47,16 @@ class WorkflowService
                 continue;
             }
 
-            $steps[] = [
+            $stepPayload = [
                 'title' => $title,
                 'is_required' => isset($step['is_required']) ? (bool) $step['is_required'] : true,
-                'order' => count($steps) + 1,
             ];
+
+            if ($hasOrderColumn) {
+                $stepPayload['order'] = count($steps) + 1;
+            }
+
+            $steps[] = $stepPayload;
         }
 
         if (count($steps) === 0) {

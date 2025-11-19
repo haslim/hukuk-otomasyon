@@ -14,6 +14,10 @@ class WorkflowTemplate extends BaseModel
 
     public function steps(): HasMany
     {
-        return $this->hasMany(WorkflowStep::class, 'template_id')->orderBy('order');
+        $relation = $this->hasMany(WorkflowStep::class, 'template_id');
+        if (WorkflowStep::hasOrderColumn()) {
+            return $relation->orderBy('order');
+        }
+        return $relation->orderBy('created_at');
     }
 }

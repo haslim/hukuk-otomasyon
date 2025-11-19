@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\WorkflowTemplate;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Schema;
 
 class WorkflowStep extends BaseModel
 {
@@ -16,5 +16,14 @@ class WorkflowStep extends BaseModel
     public function template(): BelongsTo
     {
         return $this->belongsTo(WorkflowTemplate::class, 'template_id');
+    }
+
+    public static function hasOrderColumn(): bool
+    {
+        static $exists = null;
+        if ($exists === null) {
+            $exists = Schema::hasColumn('workflow_steps', 'order');
+        }
+        return $exists;
     }
 }
