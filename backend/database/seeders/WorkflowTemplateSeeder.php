@@ -76,6 +76,7 @@ class WorkflowTemplateSeeder
 
             foreach ($templateData['steps'] as $index => $step) {
                 $payload = [
+                    'id' => Uuid::uuid4()->toString(),
                     'title' => $step['title'],
                     'is_required' => $step['is_required'],
                     'template_id' => $template->id,
