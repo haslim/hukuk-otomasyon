@@ -98,18 +98,18 @@ return function (App $app) {
                 $workflow->post('/templates', [WorkflowController::class, 'store']);
             })->add(new AuditLogMiddleware('workflow'));
 
+            // User menu route (no auth middleware required for basic functionality)
+            $protected->get('/menu/my', [MenuController::class, 'getMyMenu']);
+
             $protected->group('/menu', function (Group $menu) {
                 $menu->get('', [MenuController::class, 'index']);
                 $menu->post('', [MenuController::class, 'store']);
                 $menu->get('/{id}', [MenuController::class, 'show']);
                 $menu->put('/{id}', [MenuController::class, 'update']);
                 $menu->delete('/{id}', [MenuController::class, 'destroy']);
-                $menu->get('/my', [MenuController::class, 'getMyMenu']);
                 $menu->get('/roles/{id}/permissions', [MenuController::class, 'getPermissions']);
                 $menu->put('/roles/{id}/permissions', [MenuController::class, 'updatePermissions']);
             })->add(new RoleMiddleware('USER_MANAGE'));
-
-            $protected->get('/menu/my', [MenuController::class, 'getMyMenu']);
 
             $protected->get('/calendar/events', [CalendarController::class, 'events']);
         })->add(new AuthMiddleware());

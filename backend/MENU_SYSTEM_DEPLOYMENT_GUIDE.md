@@ -16,12 +16,14 @@ Rol bazlı dinamik menü yönetim sistemi.
 
 ### 1. Veritabanı Migration
 
-**ÖNEMLİ:** Production ortamında `backend/menu-tables-final.sql` dosyasını manuel çalıştırın.
+**ÖNEMLİ:** Production ortamında `backend/menu-tables-simple.sql` dosyasını manuel çalıştırın.
 
 ```sql
 -- MySQL/phpMyAdmin veya benzeri araçla bu dosyayı import edin
--- backend/menu-tables-final.sql
+-- backend/menu-tables-simple.sql
 ```
+
+Bu dosya foreign key sorunlarını atlamak için tasarlanmıştır ve uygulama seviyesinde veri bütünlüğü sağlar.
 
 Bu dosya şunları yapar:
 - `menu_items` ve `menu_permissions` tablolarını oluşturur
