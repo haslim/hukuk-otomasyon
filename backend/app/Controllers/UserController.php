@@ -67,7 +67,7 @@ class UserController extends Controller
         $roleIds = is_array($data['roles'] ?? null) ? $data['roles'] : [];
 
         // Database transaction ile data integrity sağla
-        $user = \DB::transaction(function () use ($fullName, $email, $password, $status, $roleIds) {
+        $user = DB::transaction(function () use ($fullName, $email, $password, $status, $roleIds) {
             $user = new User();
             $user->name = $fullName;
             $user->email = $email;
@@ -207,7 +207,7 @@ class UserController extends Controller
             ->pluck('id')
             ->all();
 
-        $role = \DB::transaction(function () use ($name, $enabledIds) {
+        $role = DB::transaction(function () use ($name, $enabledIds) {
             $role = new Role();
             $role->name = $name;
             $role->key = strtolower(str_replace(' ', '_', $name));
