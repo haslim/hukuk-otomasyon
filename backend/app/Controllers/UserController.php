@@ -98,7 +98,7 @@ class UserController extends Controller
     public function show(Request $request, Response $response, array $args): Response
     {
         $user = User::withTrashed()->with('roles')->find($args['id'] ?? null);
-        if (!$user) {
+        if (!$user || !($user instanceof User)) {
             return $this->json($response, ['message' => 'User not found'], 404);
         }
 
@@ -108,7 +108,7 @@ class UserController extends Controller
     public function update(Request $request, Response $response, array $args): Response
     {
         $user = User::withTrashed()->with('roles')->find($args['id'] ?? null);
-        if (!$user) {
+        if (!$user || !($user instanceof User)) {
             return $this->json($response, ['message' => 'User not found'], 404);
         }
 
@@ -155,7 +155,7 @@ class UserController extends Controller
     public function destroy(Request $request, Response $response, array $args): Response
     {
         $user = User::withTrashed()->find($args['id'] ?? null);
-        if (!$user) {
+        if (!$user || !($user instanceof User)) {
             return $this->json($response, ['message' => 'User not found'], 404);
         }
 
@@ -167,7 +167,7 @@ class UserController extends Controller
     public function toggleStatus(Request $request, Response $response, array $args): Response
     {
         $user = User::withTrashed()->with('roles')->find($args['id'] ?? null);
-        if (!$user) {
+        if (!$user || !($user instanceof User)) {
             return $this->json($response, ['message' => 'User not found'], 404);
         }
 
