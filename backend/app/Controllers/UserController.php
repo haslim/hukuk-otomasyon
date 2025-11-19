@@ -8,7 +8,6 @@ use App\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -66,39 +65,29 @@ class UserController extends Controller
         $status = $data['status'] ?? 'active';
         $roleIds = is_array($data['roles'] ?? null) ? $data['roles'] : [];
 
-        // Database transaction ile data integrity sağla
-        try {
-            \DB::beginTransaction();
-            
-            $user = new User();
-            $user->name = $fullName;
-            $user->email = $email;
-            $user->password = password_hash($password, PASSWORD_BCRYPT);
-            $user->save();
+        // Kullanıcı oluştur ve rolleri ata
+        $user = new User();
+        $user->name = $fullName;
+        $user->email = $email;
+        $user->password = password_hash($password, PASSWORD_BCRYPT);
+        $user->save();
 
-            if (!empty($roleIds)) {
-                $validRoleIds = Role::whereIn('id', $roleIds)->pluck('id')->all();
-                $user->roles()->sync($validRoleIds);
-            } else {
-                // Varsayılan olarak yeni kullanıcılar için 'lawyer' rolü atanır
-                $defaultRole = Role::where('key', 'lawyer')->first();
-                if ($defaultRole) {
-                    $user->roles()->attach($defaultRole->id);
-                }
+        if (!empty($roleIds)) {
+            $validRoleIds = Role::whereIn('id', $roleIds)->pluck('id')->all();
+            $user->roles()->sync($validRoleIds);
+        } else {
+            // Varsayılan olarak yeni kullanıcılar için 'lawyer' rolü atanır
+            $defaultRole = Role::where('key', 'lawyer')->first();
+            if ($defaultRole) {
+                $user->roles()->attach($defaultRole->id);
             }
-
-            if ($status === 'inactive') {
-                $user->delete();
-            }
-
-            $user->load('roles');
-            
-            \DB::commit();
-            return $user;
-        } catch (\Exception $e) {
-            \DB::rollBack();
-            throw $e;
         }
+
+        if ($status === 'inactive') {
+            $user->delete();
+        }
+
+        $user->load('roles');
 
         return $this->json($response, $this->transformUser($user), 201);
     }
@@ -214,27 +203,17 @@ class UserController extends Controller
             ->pluck('id')
             ->all();
 
-        try {
-            \DB::beginTransaction();
-            
-            $role = new Role();
-            $role->name = $name;
-            $role->key = strtolower(str_replace(' ', '_', $name));
-            $role->save();
+        $role = new Role();
+        $role->name = $name;
+        $role->key = strtolower(str_replace(' ', '_', $name));
+        $role->save();
 
-            if (!empty($enabledIds)) {
-                $validPermissionIds = Permission::whereIn('id', $enabledIds)->pluck('id')->all();
-                $role->permissions()->sync($validPermissionIds);
-            }
-
-            $role->load('permissions');
-            
-            \DB::commit();
-            return $role;
-        } catch (\Exception $e) {
-            \DB::rollBack();
-            throw $e;
+        if (!empty($enabledIds)) {
+            $validPermissionIds = Permission::whereIn('id', $enabledIds)->pluck('id')->all();
+            $role->permissions()->sync($validPermissionIds);
         }
+
+        $role->load('permissions');
 
         $result = [
             'id' => $role->id,
