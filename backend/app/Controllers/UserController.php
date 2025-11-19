@@ -65,28 +65,32 @@ class UserController extends Controller
         $status = $data['status'] ?? 'active';
         $roleIds = is_array($data['roles'] ?? null) ? $data['roles'] : [];
 
-        $user = new User();
-        $user->name = $fullName;
-        $user->email = $email;
-        $user->password = password_hash($password, PASSWORD_BCRYPT);
-        $user->save();
+        // Database transaction ile data integrity sağla
+        $user = \DB::transaction(function () use ($fullName, $email, $password, $status, $roleIds) {
+            $user = new User();
+            $user->name = $fullName;
+            $user->email = $email;
+            $user->password = password_hash($password, PASSWORD_BCRYPT);
+            $user->save();
 
-        if (!empty($roleIds)) {
-            $validRoleIds = Role::whereIn('id', $roleIds)->pluck('id')->all();
-            $user->roles()->sync($validRoleIds);
-        } else {
-            // Varsayılan olarak yeni kullanıcılar için 'lawyer' rolü atanır
-            $defaultRole = Role::where('key', 'lawyer')->first();
-            if ($defaultRole) {
-                $user->roles()->attach($defaultRole->id);
+            if (!empty($roleIds)) {
+                $validRoleIds = Role::whereIn('id', $roleIds)->pluck('id')->all();
+                $user->roles()->sync($validRoleIds);
+            } else {
+                // Varsayılan olarak yeni kullanıcılar için 'lawyer' rolü atanır
+                $defaultRole = Role::where('key', 'lawyer')->first();
+                if ($defaultRole) {
+                    $user->roles()->attach($defaultRole->id);
+                }
             }
-        }
 
-        if ($status === 'inactive') {
-            $user->delete();
-        }
+            if ($status === 'inactive') {
+                $user->delete();
+            }
 
-        $user->load('roles');
+            $user->load('roles');
+            return $user;
+        });
 
         return $this->json($response, $this->transformUser($user), 201);
     }
