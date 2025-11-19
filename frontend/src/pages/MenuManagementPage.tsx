@@ -127,12 +127,17 @@ export const MenuManagementPage: React.FC = () => {
   };
 
   // Sadece admin kullanıcılarının erişebilmesi için kontrol
-  if (!user?.roles?.includes('administrator')) {
+  const isAdmin = user?.roles?.some((role: any) => 
+    typeof role === 'string' ? role === 'administrator' : role?.key === 'administrator'
+  );
+  
+  if (!isAdmin) {
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h2 className="text-red-800 font-semibold mb-2">Erişim Engellendi</h2>
           <p className="text-red-600">Bu sayfaya sadece administrator rolüne sahip kullanıcılar erişebilir.</p>
+          <p className="text-red-600 text-sm mt-2">Mevcut rol: {JSON.stringify(user?.roles)}</p>
         </div>
       </div>
     );
