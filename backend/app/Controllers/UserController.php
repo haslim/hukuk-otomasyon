@@ -8,6 +8,7 @@ use App\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
