@@ -14,6 +14,7 @@ use App\Controllers\TaskController;
 use App\Controllers\WorkflowController;
 use App\Controllers\UserController;
 use App\Controllers\ProfileController;
+use App\Controllers\ArbitrationController;
 use App\Middleware\AuditLogMiddleware;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -118,6 +119,21 @@ return function (App $app) {
                 $settings->get('', [ProfileController::class, 'settings']);
                 $settings->put('', [ProfileController::class, 'updateSettings']);
             });
+
+            // Arabuluculuk routes
+            $protected->group('/arbitration', function (Group $arbitration) {
+                $arbitration->get('', [ArbitrationController::class, 'index']);
+                $arbitration->post('', [ArbitrationController::class, 'store']);
+                $arbitration->get('/{id}', [ArbitrationController::class, 'show']);
+                $arbitration->put('/{id}', [ArbitrationController::class, 'update']);
+                $arbitration->delete('/{id}', [ArbitrationController::class, 'destroy']);
+                $arbitration->put('/{id}/assign-mediator', [ArbitrationController::class, 'assignMediator']);
+                $arbitration->put('/{id}/change-status', [ArbitrationController::class, 'changeStatus']);
+                $arbitration->post('/{id}/documents', [ArbitrationController::class, 'uploadDocument']);
+                $arbitration->get('/{id}/documents', [ArbitrationController::class, 'getDocuments']);
+                $arbitration->get('/{id}/timeline', [ArbitrationController::class, 'getTimeline']);
+                $arbitration->get('/statistics', [ArbitrationController::class, 'getStatistics']);
+            })->add(new AuditLogMiddleware('arbitration'));
 
         })->add(new AuthMiddleware());
     });

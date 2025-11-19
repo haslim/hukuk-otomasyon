@@ -19,6 +19,8 @@ import { MediationNewPage } from '../pages/mediation/MediationNewPage';
 import { ProfilePage } from '../pages/Profile/ProfilePage';
 import { MenuManagementPage } from '../pages/MenuManagementPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import ArbitrationListPage from '../pages/Arbitration/ArbitrationListPage';
+import ArbitrationDashboardPage from '../pages/Arbitration/ArbitrationDashboardPage';
 
 export const AppRoutes = () => (
   <Routes>
@@ -42,5 +44,7 @@ export const AppRoutes = () => (
     <Route path="/profile" element={<ProfilePage />} />
     <Route path="/menu-management" element={<MenuManagementPage />} />
     <Route path="/users/settings" element={<SettingsPage />} />
+    <Route path="/arbitration" element={<ArbitrationListPage />} />
+    <Route path="/arbitration/dashboard" element={<ArbitrationDashboardPage />} />
   </Routes>
 );
