@@ -14,6 +14,6 @@ class WorkflowTemplate extends BaseModel
 
     public function steps(): HasMany
     {
-        return $this->hasMany(WorkflowStep::class, 'template_id');
+        return $this->hasMany(WorkflowStep::class, 'template_id')->orderBy('order');
     }
 }

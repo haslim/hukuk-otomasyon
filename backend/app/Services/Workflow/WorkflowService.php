@@ -3,6 +3,7 @@
 namespace App\Services\Workflow;
 
 use App\Repositories\WorkflowRepository;
+use InvalidArgumentException;
 
 class WorkflowService
 {
@@ -24,5 +25,47 @@ class WorkflowService
             'is_required' => $step->is_required,
             'status' => 'pending'
         ])->toArray();
+    }
+
+    public function createTemplate(array $data)
+    {
+        $name = trim((string) ($data['name'] ?? ''));
+        $caseType = trim((string) ($data['case_type'] ?? ''));
+
+        if ($name === '' || $caseType === '') {
+            throw new InvalidArgumentException('Workflow template name and case type are required.');
+        }
+
+        $rawSteps = $data['steps'] ?? [];
+        $steps = [];
+
+        foreach ($rawSteps as $step) {
+            $title = trim((string) ($step['title'] ?? ''));
+            if ($title === '') {
+                continue;
+            }
+
+            $steps[] = [
+                'title' => $title,
+                'is_required' => isset($step['is_required']) ? (bool) $step['is_required'] : true,
+                'order' => count($steps) + 1,
+            ];
+        }
+
+        if (count($steps) === 0) {
+            throw new InvalidArgumentException('At least one workflow step is required.');
+        }
+
+        $template = $this->templates->create([
+            'name' => $name,
+            'case_type' => $caseType,
+            'tags' => $data['tags'] ?? null,
+        ]);
+
+        foreach ($steps as $step) {
+            $template->steps()->create($step);
+        }
+
+        return $template->load('steps');
     }
 }

@@ -91,7 +91,12 @@ return function (App $app) {
             });
 
             $protected->get('/search', [SearchController::class, 'globalSearch']);
-            $protected->get('/workflow/templates', [WorkflowController::class, 'templates']);
+
+            $protected->group('/workflow', function (Group $workflow) {
+                $workflow->get('/templates', [WorkflowController::class, 'templates']);
+                $workflow->post('/templates', [WorkflowController::class, 'store']);
+            })->add(new AuditLogMiddleware('workflow'));
+
             $protected->get('/calendar/events', [CalendarController::class, 'events']);
         })->add(new AuthMiddleware());
     });

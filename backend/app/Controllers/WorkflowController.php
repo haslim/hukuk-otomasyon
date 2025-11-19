@@ -29,6 +29,13 @@ class WorkflowController extends Controller
         return $this->json($response, $templates->toArray());
     }
 
+    public function store(Request $request, Response $response): Response
+    {
+        $payload = (array) $request->getParsedBody();
+        $template = $this->workflowService->createTemplate($payload);
+        return $this->json($response, $template->toArray(), 201);
+    }
+
     public function attachWorkflow(Request $request, Response $response, array $args): Response
     {
         $payload = (array) $request->getParsedBody();
