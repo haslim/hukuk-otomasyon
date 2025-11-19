@@ -53,6 +53,10 @@ class AuthMiddleware implements MiddlewareInterface
         }
 
         AuthContext::setUser($user);
+        
+        // Also set user as request attribute for compatibility
+        $request = $request->withAttribute('user', $user);
+        
         return $handler->handle($request);
     }
 
