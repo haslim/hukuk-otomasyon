@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class AdminUserSeeder
 {
@@ -27,6 +28,10 @@ class AdminUserSeeder
 
         $user->save();
 
+        $schema = Capsule::connection()->getSchemaBuilder();
+        $permissionHasName = $schema->hasColumn('permissions', 'name');
+        $roleHasName = $schema->hasColumn('roles', 'name');
+
         $permissionDefinitions = [
             '*' => 'Full system access',
             'CASE_VIEW_ALL' => 'View all cases',
@@ -37,17 +42,13 @@ class AdminUserSeeder
 
         $permissionIds = [];
         foreach ($permissionDefinitions as $key => $label) {
-            $permission = Permission::firstOrCreate(
-                ['key' => $key],
-                ['name' => $label]
-            );
+            $values = $permissionHasName ? ['name' => $label] : [];
+            $permission = Permission::firstOrCreate(['key' => $key], $values);
             $permissionIds[] = $permission->id;
         }
 
-        $adminRole = Role::firstOrCreate(
-            ['key' => 'administrator'],
-            ['name' => 'Administrator']
-        );
+        $roleValues = $roleHasName ? ['name' => 'Administrator'] : [];
+        $adminRole = Role::firstOrCreate(['key' => 'administrator'], $roleValues);
         $adminRole->permissions()->syncWithoutDetaching($permissionIds);
         $user->roles()->syncWithoutDetaching([$adminRole->id]);
 
