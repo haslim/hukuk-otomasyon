@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { DEFAULT_AVATAR_URL, useAuth } from '../context/AuthContext';
 import { ProfileModal } from '../components/ProfileModal';
+import { NotificationDropdown } from '../components/NotificationDropdown';
 
 const titles: Record<string, string> = {
   '/': 'Dashboard',
@@ -68,12 +69,7 @@ export const AppLayout = ({ children }: Props) => {
                 placeholder="Ara..."
               />
             </label>
-            <button className="relative flex items-center justify-center rounded-lg h-10 w-10 border border-[#E2E8F0] hover:bg-gray-100 transition-colors">
-              <span className="material-symbols-outlined text-[#1A202C]">notifications</span>
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold">
-                3
-              </span>
-            </button>
+            <NotificationDropdown />
             <div className="relative">
               <button
                 type="button"
