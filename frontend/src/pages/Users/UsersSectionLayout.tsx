@@ -14,10 +14,16 @@ const sections = [
     description: 'Roller ve yetki setleri',
     to: '/users/roles',
   },
+  {
+    key: 'settings',
+    label: 'Ayarlar',
+    description: 'Sistem ayarları',
+    to: '/users/settings',
+  },
 ];
 
 interface Props {
-  activeTab: 'users' | 'roles';
+  activeTab: 'users' | 'roles' | 'settings';
   children: ReactNode;
 }
 
@@ -56,4 +62,3 @@ export const UsersSectionLayout = ({ activeTab, children }: Props) => {
     </div>
   );
 };
-

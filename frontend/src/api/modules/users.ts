@@ -105,3 +105,28 @@ export const RolesApi = {
   
   getPermissions: () => apiClient.get('/permissions').then((res: any) => res.data),
 };
+
+export interface SettingsData {
+  notifications: {
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+    caseUpdates: boolean;
+    taskReminders: boolean;
+  };
+  appearance: {
+    theme: string;
+    language: string;
+    timezone: string;
+  };
+  privacy: {
+    showProfileToOthers: boolean;
+    showOnlineStatus: boolean;
+  };
+}
+
+export const SettingsApi = {
+  getSettings: () => apiClient.get('/settings').then((res: any) => res.data),
+  
+  updateSettings: (settings: SettingsData) =>
+    apiClient.put('/settings', { settings }).then((res: any) => res.data),
+};

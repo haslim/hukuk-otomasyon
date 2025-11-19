@@ -113,6 +113,12 @@ return function (App $app) {
             })->add(new RoleMiddleware('USER_MANAGE'));
 
             $protected->get('/calendar/events', [CalendarController::class, 'events']);
+
+            $protected->group('/settings', function (Group $settings) {
+                $settings->get('', [ProfileController::class, 'settings']);
+                $settings->put('', [ProfileController::class, 'updateSettings']);
+            });
+
         })->add(new AuthMiddleware());
     });
 };
