@@ -166,7 +166,7 @@ export const RoleManagementPage = () => {
     if (!roleName) return;
     
     const newRole: Role = {
-      id: roleName.toLowerCase().replace(/\s+/g, '_'),
+      id: '', // Yeni rol için boş ID, backend tarafından oluşturulacak
       name: roleName,
       permissions: defaultRoles[0].permissions.map((permission) => ({ ...permission, enabled: false })),
     };
@@ -243,10 +243,26 @@ export const RoleManagementPage = () => {
           {currentRole && (
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
               <div className="border-b border-gray-200 px-6 py-5">
-                <h2 className="text-xl font-semibold text-gray-900">{currentRole.name} Yetkileri</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {currentRole.name} rolünün izinlerini açıp kapatarak sistem erişimini tanımlayın.
-                </p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">{currentRole.name} Yetkileri</h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {currentRole.name} rolünün izinlerini açıp kapatarak sistem erişimini tanımlayın.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCurrentRole(prev => prev ? {
+                        ...prev,
+                        permissions: (prev.permissions ?? []).map(permission => ({ ...permission, enabled: true }))
+                      } : null);
+                      setHasChanges(true);
+                    }}
+                    className="rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Hepsini Seç
+                  </button>
+                </div>
               </div>
               <div className="space-y-5 p-6">
                 {(currentRole.permissions ?? []).map((permission: Permission) => (
