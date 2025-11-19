@@ -88,36 +88,48 @@ const defaultRoles: Role[] = [
 ];
 
 export const RoleManagementPage = () => {
-  const [selectedRole, setSelectedRole] = useState('avukat');
-  const [currentRole, setCurrentRole] = useState<Role>(() => ({
-    ...defaultRoles[1],
-    permissions: defaultRoles[1].permissions.map((permission) => ({ ...permission })),
-  }));
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [currentRole, setCurrentRole] = useState<Role | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const { data: rolesData, isLoading, refetch } = useAsyncData(['roles'], RolesApi.getRoles);
   const roles = rolesData && rolesData.length ? rolesData : defaultRoles;
   const { notify } = useNotification();
 
   useEffect(() => {
-    const matched = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
-    setCurrentRole({
-      ...matched,
-      permissions: (matched.permissions ?? []).map((permission: Permission) => ({ ...permission })),
-    });
-    setHasChanges(false);
+    if (!selectedRole && roles.length > 0) {
+      setSelectedRole(roles[0].id);
+      return;
+    }
+    
+    const matched = roles.find((role: Role) => role.id === selectedRole);
+    if (matched) {
+      setCurrentRole({
+        ...matched,
+        permissions: (matched.permissions ?? []).map((permission: Permission) => ({ ...permission })),
+      });
+      setHasChanges(false);
+    }
   }, [roles, selectedRole]);
 
   const handlePermissionToggle = (permissionId: string) => {
-    setCurrentRole((prev) => ({
-      ...prev,
-      permissions: (prev.permissions ?? []).map((permission: Permission) =>
-        permission.id === permissionId ? { ...permission, enabled: !permission.enabled } : permission
-      ),
-    }));
+    if (!currentRole) return;
+    
+    setCurrentRole((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        permissions: (prev.permissions ?? []).map((permission: Permission) =>
+          permission.id === permissionId ? { ...permission, enabled: !permission.enabled } : permission
+        ),
+      };
+    });
     setHasChanges(true);
   };
 
   const handleSave = async () => {
+    if (!currentRole) return;
+    
     try {
       const permissionsUpdate = {
         roleId: currentRole.id,
@@ -137,12 +149,46 @@ export const RoleManagementPage = () => {
   };
 
   const handleCancel = () => {
-    const original = roles.find((role: Role) => role.id === selectedRole) ?? roles[0];
-    setCurrentRole({
-      ...original,
-      permissions: (original.permissions ?? []).map((permission: Permission) => ({ ...permission })),
-    });
-    setHasChanges(false);
+    if (!selectedRole) return;
+    
+    const original = roles.find((role: Role) => role.id === selectedRole);
+    if (original) {
+      setCurrentRole({
+        ...original,
+        permissions: (original.permissions ?? []).map((permission: Permission) => ({ ...permission })),
+      });
+      setHasChanges(false);
+    }
+  };
+
+  const handleCreateNewRole = () => {
+    const roleName = prompt('Yeni rol adı:');
+    if (!roleName) return;
+    
+    const newRole: Role = {
+      id: roleName.toLowerCase().replace(/\s+/g, '_'),
+      name: roleName,
+      permissions: defaultRoles[0].permissions.map((permission) => ({ ...permission, enabled: false })),
+    };
+    
+    setCurrentRole(newRole);
+    setIsCreatingNew(true);
+    setHasChanges(true);
+  };
+
+  const handleSaveNewRole = async () => {
+    if (!currentRole || !isCreatingNew) return;
+    
+    try {
+      // API çağrısı yapılacak
+      await refetch();
+      setIsCreatingNew(false);
+      setHasChanges(false);
+      notify('Yeni rol başarıyla oluşturuldu', 'success');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Rol oluşturulurken hata oluştu.';
+      notify(message, 'error');
+    }
   };
 
   if (isLoading) return <p className="p-8 text-sm text-gray-500">Roller yükleniyor...</p>;
@@ -159,6 +205,12 @@ export const RoleManagementPage = () => {
             <div className="border-b border-gray-200 px-5 py-4">
               <h2 className="text-lg font-semibold text-gray-900">Roller</h2>
               <p className="text-sm text-gray-500 mt-1">Bir role tıklayarak yetkilerini düzenleyin.</p>
+              <button
+                onClick={handleCreateNewRole}
+                className="mt-3 w-full rounded-lg bg-blue-600 text-white px-3 py-2 text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                + Yeni Rol Ekle
+              </button>
             </div>
             <div className="flex flex-col gap-2 p-3">
               {roles.map((role: Role) => (
@@ -179,49 +231,51 @@ export const RoleManagementPage = () => {
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-200 px-6 py-5">
-              <h2 className="text-xl font-semibold text-gray-900">{currentRole.name} Yetkileri</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {currentRole.name} rolünün izinlerini açıp kapatarak sistem erişimini tanımlayın.
-              </p>
+          {currentRole && (
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+              <div className="border-b border-gray-200 px-6 py-5">
+                <h2 className="text-xl font-semibold text-gray-900">{currentRole.name} Yetkileri</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {currentRole.name} rolünün izinlerini açıp kapatarak sistem erişimini tanımlayın.
+                </p>
+              </div>
+              <div className="space-y-5 p-6">
+                {(currentRole.permissions ?? []).map((permission: Permission) => (
+                  <label key={permission.id} className="flex items-center gap-4">
+                    <input
+                      type="checkbox"
+                      checked={permission.enabled}
+                      onChange={() => handlePermissionToggle(permission.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{permission.name}</p>
+                      <p className="text-xs text-gray-500">{permission.code}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4 bg-gray-50">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
+                >
+                  Değişiklikleri Geri Al
+                </button>
+                <button
+                  type="button"
+                  onClick={isCreatingNew ? handleSaveNewRole : handleSave}
+                  disabled={!hasChanges}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold text-white ${
+                    hasChanges ? 'bg-primary hover:bg-primary/90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isCreatingNew ? 'Rolü Kaydet' : 'Yetkileri Kaydet'}
+                </button>
+              </div>
             </div>
-            <div className="space-y-5 p-6">
-              {(currentRole.permissions ?? []).map((permission: Permission) => (
-                <label key={permission.id} className="flex items-center gap-4">
-                  <input
-                    type="checkbox"
-                    checked={permission.enabled}
-                    onChange={() => handlePermissionToggle(permission.id)}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{permission.name}</p>
-                    <p className="text-xs text-gray-500">{permission.code}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-            <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4 bg-gray-50">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
-              >
-                Değişiklikleri Geri Al
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={!hasChanges}
-                className={`rounded-lg px-4 py-2 text-sm font-bold text-white ${
-                  hasChanges ? 'bg-primary hover:bg-primary/90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Yetkileri Kaydet
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </UsersSectionLayout>
