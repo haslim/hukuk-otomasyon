@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Schema;
 
 class WorkflowStep extends BaseModel
 {
@@ -22,7 +22,8 @@ class WorkflowStep extends BaseModel
     {
         static $exists = null;
         if ($exists === null) {
-            $exists = Schema::hasColumn('workflow_steps', 'order');
+            $connection = Capsule::connection();
+            $exists = $connection->getSchemaBuilder()->hasColumn('workflow_steps', 'order');
         }
         return $exists;
     }
