@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationDocument extends Model
 {
@@ -129,18 +130,19 @@ class ApplicationDocument extends Model
     // Dosya işlemleri
     public function getFilePath(): string
     {
-        return storage_path('app/public/' . $this->file_path);
+        // Storage facade kullanarak dosya yolunu al
+        return Storage::disk('local')->path('public/' . $this->file_path);
     }
 
     public function fileExists(): bool
     {
-        return file_exists($this->getFilePath());
+        return Storage::disk('local')->exists('public/' . $this->file_path);
     }
 
     public function deleteFile(): bool
     {
         if ($this->fileExists()) {
-            return unlink($this->getFilePath());
+            return Storage::disk('local')->delete('public/' . $this->file_path);
         }
         return true;
     }
