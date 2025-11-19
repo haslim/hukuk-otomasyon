@@ -59,12 +59,11 @@ SET @lawyer_role_id = (SELECT id FROM roles WHERE `key` = 'lawyer' LIMIT 1);
 -- Step 7: Insert permissions for administrator (all menus visible)
 INSERT INTO `menu_permissions` (`id`, `role_id`, `menu_item_id`, `is_visible`)
 SELECT 
-    CONCAT('550e8400-e29b-41d4-a716-44665544', LPAD(menu_item_index, 3, '0')) as id,
+    CONCAT('550e8400-e29b-41d4-a716-44665544', LPAD(mi.sort_order, 3, '0')) as id,
     @admin_role_id as role_id,
-    id as menu_item_id,
+    mi.id as menu_item_id,
     1 as is_visible
-FROM menu_items
-CROSS JOIN (SELECT 1 as menu_item_index) as dummy
+FROM menu_items mi
 WHERE @admin_role_id IS NOT NULL;
 
 -- Step 8: Insert permissions for lawyer (restricted menus - exclude profile, users, workflow, menu-management)
@@ -116,4 +115,4 @@ SELECT
 FROM menu_permissions mp
 JOIN menu_items mi ON mp.menu_item_id = mi.id
 JOIN roles r ON mp.role_id = r.id
-ORDER BY r.name, mi.sort_limit;
+ORDER BY r.name, mi.sort_order;
