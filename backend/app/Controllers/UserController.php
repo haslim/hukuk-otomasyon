@@ -208,9 +208,10 @@ class UserController extends Controller
         $role->key = strtolower(str_replace(' ', '_', $name));
         $role->save();
 
+        // Rol oluşturduktan sonra permission'ları ekle
         if (!empty($enabledIds)) {
             $validPermissionIds = Permission::whereIn('id', $enabledIds)->pluck('id')->all();
-            $role->permissions()->sync($validPermissionIds);
+            $role->permissions()->attach($validPermissionIds);
         }
 
         $role->load('permissions');
