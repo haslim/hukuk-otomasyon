@@ -81,11 +81,23 @@ export const UserManagementPage = () => {
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
+    
+    // API'den gelen roller string[] formatında, ancak frontend string[] bekliyor
+    // Roller mapping yapılmalı
+    const mappedRoles = (user.roles || []).map((role: any) => {
+      // Eğer rol string ise, doğrudan kullan
+      if (typeof role === 'string') {
+        return role;
+      }
+      // Eğer rol object ise, id'sini kullan
+      return role.id || role.name || String(role);
+    });
+    
     setFormData({
       fullName: user.fullName,
       email: user.email,
       password: '',
-      roles: user.roles || [],
+      roles: mappedRoles,
       status: user.status,
     });
     setIsEditModalOpen(true);
