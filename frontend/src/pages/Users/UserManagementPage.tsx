@@ -6,8 +6,10 @@ import { useNotification } from '../../context/NotificationContext';
 
 export const UserManagementPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -77,9 +79,52 @@ export const UserManagementPage = () => {
     </span>
   );
 
-  const handleEditUser = (userId: string) => {
-    // Düzenleme akışı daha sonra eklenecek
-    notify('Düzenleme akışı yakında kullanıma alınacak', 'info');
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setFormData({
+      fullName: user.fullName,
+      email: user.email,
+      password: '',
+      roles: user.roles || [],
+      status: user.status,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+    
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+      
+      const updateData = {
+        fullName: formData.fullName,
+        email: formData.email,
+        ...(formData.password && { password: formData.password }),
+        roles: formData.roles,
+        status: formData.status,
+      };
+      
+      await UsersApi.updateUser(editingUser.id, updateData);
+      await refetchUsers();
+      setIsEditModalOpen(false);
+      setEditingUser(null);
+      setFormData({
+        fullName: '',
+        email: '',
+        password: '',
+        roles: [],
+        status: 'active',
+      });
+      notify('Kullanıcı başarıyla güncellendi', 'success');
+    } catch (error) {
+      setSaveError('Kullanıcı güncellenirken bir hata oluştu.');
+      const message = error instanceof Error ? error.message : 'Kullanıcı güncellenirken bir hata oluştu.';
+      notify(message, 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddUser = async () => {
@@ -106,12 +151,8 @@ export const UserManagementPage = () => {
     }
   };
 
-  const isSaveDisabled =
-    isSaving ||
-    !formData.fullName.trim() ||
-    !formData.email.trim() ||
-    !formData.password.trim() ||
-    formData.roles.length === 0;
+  const isCreateDisabled = isSaving || !formData.fullName.trim() || !formData.email.trim() || !formData.password.trim() || formData.roles.length === 0;
+  const isUpdateDisabled = isSaving || !formData.fullName.trim() || !formData.email.trim() || formData.roles.length === 0;
 
   return (
     <>
@@ -204,7 +245,7 @@ export const UserManagementPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right font-medium">
                         <button
                           type="button"
-                          onClick={() => handleEditUser(user.id)}
+                          onClick={() => handleEditUser(user)}
                           className="text-primary hover:text-primary/80 dark:text-primary-400 dark:hover:text-primary-300"
                         >
                           Düzenle
@@ -380,14 +421,209 @@ export const UserManagementPage = () => {
               <button
                 type="button"
                 onClick={handleAddUser}
-                disabled={isSaveDisabled}
+                disabled={isCreateDisabled}
                 className={`rounded-lg h-10 px-4 text-sm font-bold text-white ${
-                  isSaveDisabled
+                  isCreateDisabled
                     ? 'bg-gray-300 cursor-not-allowed'
                     : 'bg-primary hover:bg-primary/90'
                 }`}
               >
                 {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditModalOpen && (
+        <div
+          aria-labelledby="edit-modal-title"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          role="dialog"
+        >
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-lg m-4">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+              <h2
+                className="text-lg font-bold text-gray-900 dark:text-white"
+                id="edit-modal-title"
+              >
+                Kullanıcıyı Düzenle
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditingUser(null);
+                  setFormData({
+                    fullName: '',
+                    email: '',
+                    password: '',
+                    roles: [],
+                    status: 'active',
+                  });
+                }}
+                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  htmlFor="edit-fullName"
+                >
+                  Ad Soyad
+                </label>
+                <input
+                  id="edit-fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder="Ahmet Yılmaz"
+                  className="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary focus:ring-primary text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  htmlFor="edit-email"
+                >
+                  E-posta Adresi
+                </label>
+                <input
+                  id="edit-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="ahmet.yilmaz@bgaofis.com"
+                  className="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary focus:ring-primary text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  htmlFor="edit-password"
+                >
+                  Şifre
+                </label>
+                <input
+                  id="edit-password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="•••••••"
+                  className="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary focus:ring-primary text-sm"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Değiştirmek istemiyorsanız boş bırakın.
+                </p>
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  htmlFor="edit-roles"
+                >
+                  Roller
+                </label>
+                <select
+                  id="edit-roles"
+                  multiple
+                  value={formData.roles}
+                  onChange={(e) => {
+                    const selectedRoles = Array.from(
+                      e.target.selectedOptions,
+                      (option) => option.value,
+                    );
+                    setFormData({ ...formData, roles: selectedRoles });
+                  }}
+                  className="w-full rounded border border-gray-300 bg-white text-gray-900 shadow-sm focus:border-primary focus:ring-primary focus:outline-none text-sm"
+                >
+                  {availableRoles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Durum
+                </p>
+                <div className="flex items-center">
+                  <input
+                    id="edit-status-active"
+                    name="edit-status"
+                    type="radio"
+                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                    checked={formData.status === 'active'}
+                    onChange={() => setFormData({ ...formData, status: 'active' })}
+                  />
+                  <label
+                    className="ml-2 block text-sm text-gray-900 dark:text-gray-100"
+                    htmlFor="edit-status-active"
+                  >
+                    Aktif
+                  </label>
+                </div>
+                <div className="flex items-center mt-2">
+                  <input
+                    id="edit-status-inactive"
+                    name="edit-status"
+                    type="radio"
+                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                    checked={formData.status === 'inactive'}
+                    onChange={() => setFormData({ ...formData, status: 'inactive' })}
+                  />
+                  <label
+                    className="ml-2 block text-sm text-gray-900 dark:text-gray-100"
+                    htmlFor="edit-status-inactive"
+                  >
+                    Pasif
+                  </label>
+                </div>
+              </div>
+
+              {saveError && (
+                <p className="text-xs text-red-600 dark:text-red-400">{saveError}</p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 rounded-b-xl">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditingUser(null);
+                  setFormData({
+                    fullName: '',
+                    email: '',
+                    password: '',
+                    roles: [],
+                    status: 'active',
+                  });
+                }}
+                className="rounded-lg h-10 px-4 text-sm font-bold bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                İptal
+              </button>
+              <button
+                type="button"
+                onClick={handleUpdateUser}
+                disabled={isUpdateDisabled}
+                className={`rounded-lg h-10 px-4 text-sm font-bold text-white ${
+                  isUpdateDisabled
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-primary hover:bg-primary/90'
+                }`}
+              >
+                {isSaving ? 'Güncelleniyor...' : 'Güncelle'}
               </button>
             </div>
           </div>
