@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\WorkflowStep;
 use App\Models\WorkflowTemplate;
+use Ramsey\Uuid\Uuid;
 
 class WorkflowTemplateSeeder
 {
@@ -64,6 +65,11 @@ class WorkflowTemplateSeeder
             $template->name = $templateData['name'];
             $template->tags = $templateData['tags'];
             $template->deleted_at = null;
+
+            if (empty($template->id)) {
+                $template->id = Uuid::uuid4()->toString();
+            }
+
             $template->save();
 
             $template->steps()->delete();
@@ -72,13 +78,14 @@ class WorkflowTemplateSeeder
                 $payload = [
                     'title' => $step['title'],
                     'is_required' => $step['is_required'],
+                    'template_id' => $template->id,
                 ];
 
                 if ($hasOrderColumn) {
                     $payload['order'] = $index + 1;
                 }
 
-                $template->steps()->create($payload);
+                WorkflowStep::create($payload);
             }
 
             echo "✓ {$template->name} workflow hazırlandı" . PHP_EOL;

@@ -1,0 +1,350 @@
+1. Backend .env Örneği (BGAofis – PHP + MySQL)
+
+Shared hosting’te PHP projesi kök dizininde .env dosyası:
+
+APP_NAME=BGAofis
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://bgaofis.example.com
+
+# Timezone
+APP_TIMEZONE=Europe/Istanbul
+
+# Database
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=bgaofis
+DB_USERNAME=bgaofis_user
+DB_PASSWORD=strong_password_here
+
+# JWT / Auth
+JWT_SECRET=change_this_to_a_long_random_string
+
+# Mail (name.com / hosting SMTP bilgine göre düzenle)
+MAIL_MAILER=smtp
+MAIL_HOST=mail.bgaofis.com
+MAIL_PORT=587
+MAIL_USERNAME=no-reply@bgaofis.com
+MAIL_PASSWORD=mail_password_here
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=no-reply@bgaofis.com
+MAIL_FROM_NAME="${APP_NAME}"
+
+# Logs
+LOG_CHANNEL=daily
+
+# File uploads
+FILES_UPLOAD_PATH=/home/username/bgaofis/uploads
+BACKUP_PATH=/home/username/bgaofis/backups
+
+
+Not: FILES_UPLOAD_PATH ve BACKUP_PATH’i shared hostingteki gerçek kullanıcı yoluna göre revize edeceksiniz.
+
+2. MySQL Migration SQL (Toplu Şema – BGAofis)
+
+Bunu tek seferde phpMyAdmin → SQL sekmesine yapıştırıp çalıştırabilirsiniz. Gerekirse Vibe Coding’e “bunlara uygun model ve repository yaz” diyeceksiniz.
+
+-- USERS & AUTH
+
+CREATE TABLE users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(190) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    last_login_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE roles (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE permissions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `key` VARCHAR(150) NOT NULL UNIQUE,
+    description VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE user_roles (
+    user_id BIGINT UNSIGNED NOT NULL,
+    role_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE role_permissions (
+    role_id BIGINT UNSIGNED NOT NULL,
+    permission_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (role_id, permission_id),
+    CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+    CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- CLIENTS (MÜVEKKİL / İLGİLİ KİŞİ)
+
+CREATE TABLE clients (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('individual','company') NOT NULL DEFAULT 'individual',
+    first_name VARCHAR(150) NULL,
+    last_name VARCHAR(150) NULL,
+    company_name VARCHAR(255) NULL,
+    identification_no VARCHAR(20) NULL,   -- TCKN
+    tax_no VARCHAR(20) NULL,              -- VKN
+    phone VARCHAR(50) NULL,
+    email VARCHAR(190) NULL,
+    address TEXT NULL,
+    notes TEXT NULL,
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_clients_name (last_name, first_name),
+    INDEX idx_clients_company (company_name),
+    INDEX idx_clients_ident (identification_no),
+    INDEX idx_clients_tax (tax_no),
+    CONSTRAINT fk_clients_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+    CONSTRAINT fk_clients_updated_by FOREIGN KEY (updated_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- CASES (DOSYALAR)
+
+CREATE TABLE cases (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    client_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    case_type ENUM('lawsuit','enforcement','mediation','consultancy','other') NOT NULL DEFAULT 'lawsuit',
+    court_name VARCHAR(255) NULL,
+    file_no VARCHAR(100) NULL,            -- Mahkeme dosya no
+    basis_no VARCHAR(100) NULL,           -- Esas no
+    status ENUM('open','pending','closed','appeal','supreme_court') NOT NULL DEFAULT 'open',
+    description TEXT NULL,
+    assigned_user_id BIGINT UNSIGNED NULL,
+    opened_at DATE NULL,
+    closed_at DATE NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_cases_client (client_id),
+    INDEX idx_cases_type_status (case_type, status),
+    INDEX idx_cases_file (file_no, basis_no),
+    CONSTRAINT fk_cases_client FOREIGN KEY (client_id) REFERENCES clients(id),
+    CONSTRAINT fk_cases_assigned_user FOREIGN KEY (assigned_user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- CASE PARTIES (TARAF / KARŞI TARAF / 3. KİŞİ)
+
+CREATE TABLE case_parties (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    case_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    role ENUM('plaintiff','defendant','counterparty','other') NOT NULL DEFAULT 'other',
+    contact_info TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_case_parties_case (case_id),
+    CONSTRAINT fk_case_parties_case FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- HEARINGS (DURUŞMALAR)
+
+CREATE TABLE hearings (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    case_id BIGINT UNSIGNED NOT NULL,
+    hearing_date DATETIME NOT NULL,
+    courtroom VARCHAR(150) NULL,
+    judge VARCHAR(255) NULL,
+    notes TEXT NULL,
+    result VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_hearings_case (case_id),
+    INDEX idx_hearings_date (hearing_date),
+    CONSTRAINT fk_hearings_case FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- TASKS (GÖREVLER)
+
+CREATE TABLE tasks (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    case_id BIGINT UNSIGNED NULL,
+    assigned_to BIGINT UNSIGNED NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    status ENUM('open','in_progress','completed','cancelled') NOT NULL DEFAULT 'open',
+    priority ENUM('low','medium','high') NOT NULL DEFAULT 'medium',
+    due_date DATETIME NULL,
+    completed_at DATETIME NULL,
+    created_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_tasks_case (case_id),
+    INDEX idx_tasks_assigned (assigned_to),
+    INDEX idx_tasks_status_due (status, due_date),
+    CONSTRAINT fk_tasks_case FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE SET NULL,
+    CONSTRAINT fk_tasks_assigned_to FOREIGN KEY (assigned_to) REFERENCES users(id),
+    CONSTRAINT fk_tasks_created_by FOREIGN KEY (created_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- DOCUMENTS & VERSIONS
+
+CREATE TABLE documents (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    case_id BIGINT UNSIGNED NULL,
+    client_id BIGINT UNSIGNED NULL,
+    title VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    mime_type VARCHAR(150) NULL,
+    file_size BIGINT UNSIGNED NULL,
+    uploaded_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_documents_case (case_id),
+    INDEX idx_documents_client (client_id),
+    CONSTRAINT fk_documents_case FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE SET NULL,
+    CONSTRAINT fk_documents_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    CONSTRAINT fk_documents_uploaded_by FOREIGN KEY (uploaded_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE document_versions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    document_id BIGINT UNSIGNED NOT NULL,
+    version_number INT UNSIGNED NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    created_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_doc_versions_document (document_id),
+    CONSTRAINT fk_doc_versions_document FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
+    CONSTRAINT fk_doc_versions_created_by FOREIGN KEY (created_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- WORKFLOW (CHECK-LIST / İŞ AKIŞLARI)
+
+CREATE TABLE workflows (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    case_type ENUM('lawsuit','enforcement','mediation','consultancy','other') NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE workflow_steps (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    workflow_id BIGINT UNSIGNED NOT NULL,
+    step_order INT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    is_required TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_workflow_steps_workflow (workflow_id),
+    CONSTRAINT fk_workflow_steps_workflow FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE workflow_instances (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    case_id BIGINT UNSIGNED NOT NULL,
+    workflow_id BIGINT UNSIGNED NOT NULL,
+    status ENUM('not_started','in_progress','completed') NOT NULL DEFAULT 'not_started',
+    started_at DATETIME NULL,
+    completed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_workflow_instances_case (case_id),
+    CONSTRAINT fk_workflow_instances_case FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE,
+    CONSTRAINT fk_workflow_instances_workflow FOREIGN KEY (workflow_id) REFERENCES workflows(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE workflow_instance_steps (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    workflow_instance_id BIGINT UNSIGNED NOT NULL,
+    workflow_step_id BIGINT UNSIGNED NOT NULL,
+    status ENUM('pending','completed','skipped') NOT NULL DEFAULT 'pending',
+    completed_at DATETIME NULL,
+    completed_by BIGINT UNSIGNED NULL,
+    notes TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_wi_steps_instance (workflow_instance_id),
+    CONSTRAINT fk_wi_steps_instance FOREIGN KEY (workflow_instance_id) REFERENCES workflow_instances(id) ON DELETE CASCADE,
+    CONSTRAINT fk_wi_steps_step FOREIGN KEY (workflow_step_id) REFERENCES workflow_steps(id),
+    CONSTRAINT fk_wi_steps_completed_by FOREIGN KEY (completed_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- CASH TRANSACTIONS (KASA)
+
+CREATE TABLE cash_transactions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    case_id BIGINT UNSIGNED NULL,
+    client_id BIGINT UNSIGNED NULL,
+    type ENUM('income','expense') NOT NULL,
+    category VARCHAR(150) NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    currency VARCHAR(10) NOT NULL DEFAULT 'TRY',
+    transaction_date DATE NOT NULL,
+    description TEXT NULL,
+    created_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_cash_case (case_id),
+    INDEX idx_cash_client (client_id),
+    INDEX idx_cash_date (transaction_date),
+    CONSTRAINT fk_cash_case FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE SET NULL,
+    CONSTRAINT fk_cash_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    CONSTRAINT fk_cash_created_by FOREIGN KEY (created_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- NOTIFICATIONS
+
+CREATE TABLE notifications (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    type VARCHAR(150) NOT NULL,
+    data JSON NULL,
+    is_read TINYINT(1) NOT NULL DEFAULT 0,
+    read_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_notifications_user (user_id, is_read),
+    CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE pending_notifications (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    notification_type VARCHAR(150) NOT NULL,
+    related_entity_type VARCHAR(150) NULL,
+    related_entity_id BIGINT UNSIGNED NULL,
+    due_at DATETIME NOT NULL,
+    processed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_pending_notifications_due (due_at, processed_at),
+    CONSTRAINT fk_pending_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- AUDIT LOGS (KVKK UYUMLU)
+
+CREATE TABLE audit_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NULL,
+    entity_type VARCHAR(150) NOT NULL,
+    entity_id BIGINT UNSIGNED NULL,
+    action VARCHAR(50) NOT NULL,
