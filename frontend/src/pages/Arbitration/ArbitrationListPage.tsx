@@ -7,24 +7,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from '@/components/ui/table.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/select.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu.tsx';
 import { Search, Filter, Plus, MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react';
 import {
   arbitrationApi,
@@ -34,8 +34,8 @@ import {
   getApplicationTypeColor,
   applicationTypeOptions,
   statusOptions,
-} from '@/api/modules/arbitration';
-import { useToast } from '@/hooks/use-toast';
+} from '@/api/modules/arbitration.ts';
+import { useToast } from '@/hooks/use-toast.ts';
 
 const ArbitrationListPage: React.FC = () => {
   const [applications, setApplications] = useState<ArbitrationApplication[]>([]);

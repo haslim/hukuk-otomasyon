@@ -33,5 +33,10 @@ export default defineConfig({
   preview: {
     port: 4173,
   },
+  resolve: {
+    alias: {
+      '@': './src',
+    },
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+  },
 });
-

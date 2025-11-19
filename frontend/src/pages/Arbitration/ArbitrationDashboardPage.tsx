@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { arbitrationApi, ArbitrationStatistics } from '@/api/modules/arbitration';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import { arbitrationApi, ArbitrationStatistics } from '@/api/modules/arbitration.ts';
+import { useToast } from '@/hooks/use-toast.ts';
 
 const ArbitrationDashboardPage: React.FC = () => {
   const [statistics, setStatistics] = useState<ArbitrationStatistics | null>(null);

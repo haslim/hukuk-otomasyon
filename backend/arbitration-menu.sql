@@ -1,3 +1,27 @@
+-- Menü tablolarını oluştur (eğer yoksa)
+CREATE TABLE IF NOT EXISTS menu_items (
+    id VARCHAR(255) PRIMARY KEY,
+    path VARCHAR(255) NOT NULL UNIQUE,
+    label VARCHAR(255) NOT NULL,
+    icon VARCHAR(100) NOT NULL,
+    sort_order INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS role_menu_permissions (
+    id VARCHAR(255) PRIMARY KEY,
+    role_id VARCHAR(255) NOT NULL,
+    menu_item_id VARCHAR(255) NOT NULL,
+    is_visible BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_item_id) REFERENCES menu_items(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_role_menu (role_id, menu_item_id)
+);
+
 -- Arabuluculuk menüsünü ekle
 INSERT INTO menu_items (id, path, label, icon, sort_order, is_active, created_at, updated_at) VALUES
 ('arbitration-dashboard', '/arbitration/dashboard', 'Arabuluculuk Dashboard', 'dashboard', 50, 1, NOW(), NOW()),
