@@ -44,6 +44,7 @@ return function (App $app) {
 
             $protected->group('/roles', function (Group $roles) {
                 $roles->get('', [UserController::class, 'roles']);
+                $roles->post('', [UserController::class, 'storeRole']);
                 $roles->put('/{id}/permissions', [UserController::class, 'updateRolePermissions']);
             })->add(new RoleMiddleware('USER_MANAGE'));
 

@@ -97,6 +97,9 @@ export const RolesApi = {
   
   getRoleById: (id: string) => apiClient.get(`/roles/${id}`).then((res: any) => res.data),
   
+  createRole: (roleData: Omit<Role, 'id'>) =>
+    apiClient.post('/roles', roleData).then((res: any) => res.data),
+  
   updateRolePermissions: (roleId: string, permissions: UpdateRolePermissionsRequest) =>
     apiClient.put(`/roles/${roleId}/permissions`, permissions).then((res: any) => res.data),
   

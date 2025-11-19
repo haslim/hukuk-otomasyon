@@ -180,8 +180,17 @@ export const RoleManagementPage = () => {
     if (!currentRole || !isCreatingNew) return;
     
     try {
-      // API çağrısı yapılacak
+      // Yeni rol oluştur
+      const createdRole = await RolesApi.createRole({
+        name: currentRole.name,
+        permissions: currentRole.permissions,
+      });
+      
+      // Rolleri yeniden yükle
       await refetch();
+      
+      // Yeni oluşturulan rolü seç
+      setSelectedRole(createdRole.id);
       setIsCreatingNew(false);
       setHasChanges(false);
       notify('Yeni rol başarıyla oluşturuldu', 'success');

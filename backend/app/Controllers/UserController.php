@@ -182,6 +182,62 @@ class UserController extends Controller
         return $this->json($response, $this->transformUser($user));
     }
 
+    public function storeRole(Request $request, Response $response): Response
+    {
+        $data = (array) $request->getParsedBody();
+        
+        $name = trim($data['name'] ?? '');
+        if ($name === '') {
+            return $this->json($response, ['message' => 'Role name is required'], 422);
+        }
+
+        // Role adı benzersiz olmalı
+        if (Role::where('name', $name)->exists()) {
+            return $this->json($response, ['message' => 'Role name already exists'], 422);
+        }
+
+        $permissionsInput = isset($data['permissions']) && is_array($data['permissions'])
+            ? $data['permissions']
+            : [];
+
+        // Sadece enabled olan permission'ları al
+        $enabledIds = collect($permissionsInput)
+            ->filter(fn ($item) => !empty($item['enabled']))
+            ->pluck('id')
+            ->all();
+
+        $role = \DB::transaction(function () use ($name, $enabledIds) {
+            $role = new Role();
+            $role->name = $name;
+            $role->key = strtolower(str_replace(' ', '_', $name));
+            $role->save();
+
+            if (!empty($enabledIds)) {
+                $validPermissionIds = Permission::whereIn('id', $enabledIds)->pluck('id')->all();
+                $role->permissions()->sync($validPermissionIds);
+            }
+
+            $role->load('permissions');
+            return $role;
+        });
+
+        $result = [
+            'id' => $role->id,
+            'name' => $role->name,
+            'permissions' => $role->permissions->map(function (Permission $perm) {
+                return [
+                    'id' => $perm->id,
+                    'name' => $perm->name,
+                    'key' => $perm->key,
+                    'description' => null,
+                    'enabled' => true,
+                ];
+            })->values()->all(),
+        ];
+
+        return $this->json($response, $result, 201);
+    }
+
     public function updateRolePermissions(Request $request, Response $response, array $args): Response
     {
         $role = Role::find($args['id'] ?? null);
