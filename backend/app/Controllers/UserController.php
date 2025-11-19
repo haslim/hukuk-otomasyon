@@ -67,7 +67,9 @@ class UserController extends Controller
         $roleIds = is_array($data['roles'] ?? null) ? $data['roles'] : [];
 
         // Database transaction ile data integrity sağla
-        $user = DB::transaction(function () use ($fullName, $email, $password, $status, $roleIds) {
+        try {
+            \DB::beginTransaction();
+            
             $user = new User();
             $user->name = $fullName;
             $user->email = $email;
@@ -90,8 +92,13 @@ class UserController extends Controller
             }
 
             $user->load('roles');
+            
+            \DB::commit();
             return $user;
-        });
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
 
         return $this->json($response, $this->transformUser($user), 201);
     }
@@ -207,7 +214,9 @@ class UserController extends Controller
             ->pluck('id')
             ->all();
 
-        $role = DB::transaction(function () use ($name, $enabledIds) {
+        try {
+            \DB::beginTransaction();
+            
             $role = new Role();
             $role->name = $name;
             $role->key = strtolower(str_replace(' ', '_', $name));
@@ -219,8 +228,13 @@ class UserController extends Controller
             }
 
             $role->load('permissions');
+            
+            \DB::commit();
             return $role;
-        });
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
 
         $result = [
             'id' => $role->id,
