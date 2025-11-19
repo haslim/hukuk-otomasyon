@@ -70,7 +70,8 @@ class WorkflowService
         ]);
 
         foreach ($steps as $step) {
-            $template->steps()->create($step);
+            $step['template_id'] = $template->id;
+            WorkflowStep::create($step);
         }
 
         return $template->load('steps');
