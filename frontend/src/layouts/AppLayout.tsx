@@ -16,9 +16,11 @@ const titles: Record<string, string> = {
   '/search': 'Gelişmiş Arama',
   '/users': 'Kullanıcı Yönetimi',
   '/users/roles': 'Roller & Yetkiler',
-  '/mediation': 'Arabuluculuk Başvuruları',
+  '/mediation': 'Arabuluculuk',
+  '/mediation/list': 'Arabuluculuk Dosyaları',
   '/mediation/new': 'Yeni Arabuluculuk Başvurusu',
-  '/arbitration': 'Arabuluculuk',
+  '/arbitration': 'Arabuluculuk Başvuruları',
+  '/arbitration/dashboard': 'Arabuluculuk İstatistikleri',
   '/profile': 'Profilim',
 };
 

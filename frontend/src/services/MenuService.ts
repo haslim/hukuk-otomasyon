@@ -7,6 +7,8 @@ export interface MenuItem {
   icon: string;
   sortOrder: number;
   isActive: boolean;
+  parentId?: string;
+  children?: MenuItem[];
   createdAt?: string;
   updatedAt?: string;
 }

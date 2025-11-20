@@ -39,6 +39,7 @@ export const AppRoutes = () => (
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route path="/search" element={<SearchPage />} />
     <Route path="/mediation" element={<MediationListPage />} />
+    <Route path="/mediation/list" element={<MediationListPage />} />
     <Route path="/mediation/new" element={<MediationNewPage />} />
     <Route path="/mediation/:id" element={<MediationDetailPage />} />
     <Route path="/profile" element={<ProfilePage />} />

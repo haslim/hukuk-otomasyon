@@ -15,21 +15,11 @@ class MenuController extends Controller
     {
         $menuItems = MenuItem::where('is_active', true)
             ->orderBy('sort_order')
-            ->get()
-            ->map(function (MenuItem $item) {
-                return [
-                    'id' => $item->id,
-                    'path' => $item->path,
-                    'label' => $item->label,
-                    'icon' => $item->icon,
-                    'sortOrder' => $item->sort_order,
-                    'isActive' => $item->is_active,
-                    'createdAt' => $item->created_at ? $item->created_at->toDateTimeString() : null,
-                    'updatedAt' => $item->updated_at ? $item->updated_at->toDateTimeString() : null,
-                ];
-            })->values()->all();
+            ->get();
 
-        return $this->json($response, $menuItems);
+        $hierarchicalMenu = $this->buildHierarchicalMenu($menuItems);
+
+        return $this->json($response, $hierarchicalMenu);
     }
 
     public function getPermissions(Request $request, Response $response, array $args): Response
@@ -43,23 +33,11 @@ class MenuController extends Controller
 
         $menuItems = MenuItem::where('is_active', true)
             ->orderBy('sort_order')
-            ->get()
-            ->map(function (MenuItem $item) use ($role) {
-                $permission = $item->menuPermissions()
-                    ->where('role_id', $role->id)
-                    ->first();
+            ->get();
 
-                return [
-                    'id' => $item->id,
-                    'path' => $item->path,
-                    'label' => $item->label,
-                    'icon' => $item->icon,
-                    'sortOrder' => $item->sort_order,
-                    'isVisible' => $permission ? $permission->is_visible : false,
-                ];
-            })->values()->all();
+        $hierarchicalMenu = $this->buildHierarchicalMenu($menuItems, $role);
 
-        return $this->json($response, $menuItems);
+        return $this->json($response, $hierarchicalMenu);
     }
 
     public function updatePermissions(Request $request, Response $response, array $args): Response
@@ -133,15 +111,7 @@ class MenuController extends Controller
                 ->get();
         }
 
-        $result = $menuItems->map(function (MenuItem $item) {
-            return [
-                'id' => $item->id,
-                'path' => $item->path,
-                'label' => $item->label,
-                'icon' => $item->icon,
-                'sortOrder' => $item->sort_order,
-            ];
-        })->values()->all();
+        $result = $this->buildHierarchicalMenu($menuItems);
 
         return $this->json($response, $result);
     }
@@ -157,6 +127,7 @@ class MenuController extends Controller
             $menuItem->icon = $data['icon'] ?? '';
             $menuItem->sort_order = $data['sortOrder'] ?? 0;
             $menuItem->is_active = $data['isActive'] ?? true;
+            $menuItem->parent_id = $data['parentId'] ?? null;
             $menuItem->save();
 
             return $menuItem;
@@ -169,6 +140,7 @@ class MenuController extends Controller
             'icon' => $menuItem->icon,
             'sortOrder' => $menuItem->sort_order,
             'isActive' => $menuItem->is_active,
+            'parentId' => $menuItem->parent_id,
             'createdAt' => $menuItem->created_at ? $menuItem->created_at->toDateTimeString() : null,
             'updatedAt' => $menuItem->updated_at ? $menuItem->updated_at->toDateTimeString() : null,
         ], 201);
@@ -188,6 +160,7 @@ class MenuController extends Controller
             'icon' => $menuItem->icon,
             'sortOrder' => $menuItem->sort_order,
             'isActive' => $menuItem->is_active,
+            'parentId' => $menuItem->parent_id,
             'createdAt' => $menuItem->created_at ? $menuItem->created_at->toDateTimeString() : null,
             'updatedAt' => $menuItem->updated_at ? $menuItem->updated_at->toDateTimeString() : null,
         ]);
@@ -217,6 +190,9 @@ class MenuController extends Controller
         if (isset($data['isActive'])) {
             $menuItem->is_active = $data['isActive'];
         }
+        if (isset($data['parentId'])) {
+            $menuItem->parent_id = $data['parentId'];
+        }
 
         $menuItem->save();
 
@@ -227,6 +203,7 @@ class MenuController extends Controller
             'icon' => $menuItem->icon,
             'sortOrder' => $menuItem->sort_order,
             'isActive' => $menuItem->is_active,
+            'parentId' => $menuItem->parent_id,
             'createdAt' => $menuItem->created_at ? $menuItem->created_at->toDateTimeString() : null,
             'updatedAt' => $menuItem->updated_at ? $menuItem->updated_at->toDateTimeString() : null,
         ]);
@@ -242,5 +219,75 @@ class MenuController extends Controller
         $menuItem->delete();
 
         return $this->json($response, ['message' => 'Menu item deleted']);
+    }
+
+    /**
+     * Build hierarchical menu structure from flat menu items
+     */
+    private function buildHierarchicalMenu(Collection $menuItems, ?Role $role = null): array
+    {
+        $menuArray = $menuItems->map(function (MenuItem $item) use ($role) {
+            $menuItemData = [
+                'id' => $item->id,
+                'path' => $item->path,
+                'label' => $item->label,
+                'icon' => $item->icon,
+                'sortOrder' => $item->sort_order,
+                'isActive' => $item->is_active,
+                'parentId' => $item->parent_id,
+                'createdAt' => $item->created_at ? $item->created_at->toDateTimeString() : null,
+                'updatedAt' => $item->updated_at ? $item->updated_at->toDateTimeString() : null,
+            ];
+
+            // If role is provided, check visibility
+            if ($role) {
+                $permission = $item->menuPermissions()
+                    ->where('role_id', $role->id)
+                    ->first();
+                $menuItemData['isVisible'] = $permission ? $permission->is_visible : false;
+            }
+
+            return $menuItemData;
+        })->values()->all();
+
+        // Build hierarchical structure
+        $indexed = [];
+        $rootItems = [];
+
+        // First pass: index all items
+        foreach ($menuArray as $item) {
+            $item['children'] = [];
+            $indexed[$item['id']] = $item;
+        }
+
+        // Second pass: build hierarchy
+        foreach ($indexed as $id => $item) {
+            if ($item['parentId'] && isset($indexed[$item['parentId']])) {
+                $indexed[$item['parentId']]['children'][] = &$indexed[$id];
+            } else {
+                $rootItems[] = &$indexed[$id];
+            }
+        }
+
+        // Sort children by sort_order
+        $this->sortMenuItemsRecursive($rootItems);
+
+        return $rootItems;
+    }
+
+    /**
+     * Sort menu items and their children recursively
+     */
+    private function sortMenuItemsRecursive(array &$items): void
+    {
+        usort($items, function ($a, $b) {
+            return $a['sortOrder'] - $b['sortOrder'];
+        });
+
+        foreach ($items as &$item) {
+            if (!empty($item['children'])) {
+                $this->sortMenuItemsRecursive($item['children']);
+            }
+        }
     }
 }
