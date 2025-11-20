@@ -27,8 +27,28 @@ export const SettingsPage = () => {
   const { notify } = useNotification();
 
   useEffect(() => {
-    if (settingsData) {
-      setSettings(settingsData);
+    console.log('SettingsPage - settingsData changed:', settingsData);
+    if (settingsData && typeof settingsData === 'object') {
+      // Ensure all nested properties exist before setting
+      const safeSettings: SettingsData = {
+        notifications: {
+          emailNotifications: settingsData.notifications?.emailNotifications ?? true,
+          pushNotifications: settingsData.notifications?.pushNotifications ?? true,
+          caseUpdates: settingsData.notifications?.caseUpdates ?? true,
+          taskReminders: settingsData.notifications?.taskReminders ?? true,
+        },
+        appearance: {
+          theme: settingsData.appearance?.theme ?? 'light',
+          language: settingsData.appearance?.language ?? 'tr',
+          timezone: settingsData.appearance?.timezone ?? 'Europe/Istanbul',
+        },
+        privacy: {
+          showProfileToOthers: settingsData.privacy?.showProfileToOthers ?? true,
+          showOnlineStatus: settingsData.privacy?.showOnlineStatus ?? true,
+        },
+      };
+      console.log('SettingsPage - safeSettings created:', safeSettings);
+      setSettings(safeSettings);
       setHasChanges(false);
     }
   }, [settingsData]);
@@ -46,42 +66,69 @@ export const SettingsPage = () => {
   };
 
   const handleCancel = () => {
-    if (settingsData) {
-      setSettings(settingsData);
+    if (settingsData && typeof settingsData === 'object') {
+      // Apply the same safe transformation as in useEffect
+      const safeSettings: SettingsData = {
+        notifications: {
+          emailNotifications: settingsData.notifications?.emailNotifications ?? true,
+          pushNotifications: settingsData.notifications?.pushNotifications ?? true,
+          caseUpdates: settingsData.notifications?.caseUpdates ?? true,
+          taskReminders: settingsData.notifications?.taskReminders ?? true,
+        },
+        appearance: {
+          theme: settingsData.appearance?.theme ?? 'light',
+          language: settingsData.appearance?.language ?? 'tr',
+          timezone: settingsData.appearance?.timezone ?? 'Europe/Istanbul',
+        },
+        privacy: {
+          showProfileToOthers: settingsData.privacy?.showProfileToOthers ?? true,
+          showOnlineStatus: settingsData.privacy?.showOnlineStatus ?? true,
+        },
+      };
+      setSettings(safeSettings);
       setHasChanges(false);
     }
   };
 
   const updateNotificationSetting = (key: keyof SettingsData['notifications'], value: boolean) => {
-    setSettings(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [key]: value,
-      },
-    }));
+    setSettings(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        notifications: {
+          ...prev.notifications,
+          [key]: value,
+        },
+      };
+    });
     setHasChanges(true);
   };
 
   const updateAppearanceSetting = (key: keyof SettingsData['appearance'], value: string) => {
-    setSettings(prev => ({
-      ...prev,
-      appearance: {
-        ...prev.appearance,
-        [key]: value,
-      },
-    }));
+    setSettings(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        appearance: {
+          ...prev.appearance,
+          [key]: value,
+        },
+      };
+    });
     setHasChanges(true);
   };
 
   const updatePrivacySetting = (key: keyof SettingsData['privacy'], value: boolean) => {
-    setSettings(prev => ({
-      ...prev,
-      privacy: {
-        ...prev.privacy,
-        [key]: value,
-      },
-    }));
+    setSettings(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        privacy: {
+          ...prev.privacy,
+          [key]: value,
+        },
+      };
+    });
     setHasChanges(true);
   };
 
@@ -109,7 +156,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={settings.notifications.emailNotifications}
+                checked={settings?.notifications?.emailNotifications ?? true}
                 onChange={(e) => updateNotificationSetting('emailNotifications', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
@@ -122,7 +169,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={settings.notifications.pushNotifications}
+                checked={settings?.notifications?.pushNotifications ?? true}
                 onChange={(e) => updateNotificationSetting('pushNotifications', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
@@ -135,7 +182,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={settings.notifications.caseUpdates}
+                checked={settings?.notifications?.caseUpdates ?? true}
                 onChange={(e) => updateNotificationSetting('caseUpdates', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
@@ -148,7 +195,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={settings.notifications.taskReminders}
+                checked={settings?.notifications?.taskReminders ?? true}
                 onChange={(e) => updateNotificationSetting('taskReminders', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
@@ -166,7 +213,7 @@ export const SettingsPage = () => {
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">Tema</label>
               <select
-                value={settings.appearance.theme}
+                value={settings?.appearance?.theme ?? 'light'}
                 onChange={(e) => updateAppearanceSetting('theme', e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
               >
@@ -179,7 +226,7 @@ export const SettingsPage = () => {
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">Dil</label>
               <select
-                value={settings.appearance.language}
+                value={settings?.appearance?.language ?? 'tr'}
                 onChange={(e) => updateAppearanceSetting('language', e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
               >
@@ -191,7 +238,7 @@ export const SettingsPage = () => {
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">Saat Dilimi</label>
               <select
-                value={settings.appearance.timezone}
+                value={settings?.appearance?.timezone ?? 'Europe/Istanbul'}
                 onChange={(e) => updateAppearanceSetting('timezone', e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
               >
@@ -218,7 +265,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={settings.privacy.showProfileToOthers}
+                checked={settings?.privacy?.showProfileToOthers ?? true}
                 onChange={(e) => updatePrivacySetting('showProfileToOthers', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
@@ -231,7 +278,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={settings.privacy.showOnlineStatus}
+                checked={settings?.privacy?.showOnlineStatus ?? true}
                 onChange={(e) => updatePrivacySetting('showOnlineStatus', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />

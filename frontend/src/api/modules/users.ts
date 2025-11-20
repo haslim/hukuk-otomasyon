@@ -125,8 +125,32 @@ export interface SettingsData {
 }
 
 export const SettingsApi = {
-  getSettings: () => apiClient.get('/settings').then((res: any) => res.data),
+  getSettings: () => apiClient.get('/settings').then((res: any) => {
+    // Handle wrapped response structure: { settings: SettingsData }
+    const response = res.data;
+    console.log('Settings API Response:', response);
+    
+    if (response && response.settings) {
+      console.log('Using wrapped settings:', response.settings);
+      return response.settings;
+    }
+    // Fallback to direct response if structure changes
+    console.log('Using direct settings response:', response);
+    return response;
+  }),
   
   updateSettings: (settings: SettingsData) =>
-    apiClient.put('/settings', { settings }).then((res: any) => res.data),
+    apiClient.put('/settings', { settings }).then((res: any) => {
+      // Handle wrapped response structure: { settings: SettingsData }
+      const response = res.data;
+      console.log('Settings Update API Response:', response);
+      
+      if (response && response.settings) {
+        console.log('Using wrapped updated settings:', response.settings);
+        return response.settings;
+      }
+      // Fallback to direct response if structure changes
+      console.log('Using direct updated settings response:', response);
+      return response;
+    }),
 };

@@ -15,6 +15,8 @@ use App\Controllers\WorkflowController;
 use App\Controllers\UserController;
 use App\Controllers\ProfileController;
 use App\Controllers\ArbitrationController;
+use App\Controllers\MediationFeeController;
+use App\Controllers\InvoiceController;
 use App\Middleware\AuditLogMiddleware;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -135,6 +137,56 @@ return function (App $app) {
                 $arbitration->get('/{id}/documents', [ArbitrationController::class, 'getDocuments']);
                 $arbitration->get('/{id}/timeline', [ArbitrationController::class, 'getTimeline']);
             })->add(new AuditLogMiddleware('arbitration'));
+
+            // Arabulucu Ücret Hesaplama routes
+            $protected->group('/mediation-fees', function (Group $fees) {
+                $fees->post('/calculate', [MediationFeeController::class, 'calculate']);
+                $fees->post('', [MediationFeeController::class, 'store']);
+                $fees->get('', [MediationFeeController::class, 'index']);
+                $fees->get('/tariffs', [MediationFeeController::class, 'tariffs']);
+                $fees->get('/{id}', [MediationFeeController::class, 'show']);
+                $fees->delete('/{id}', [MediationFeeController::class, 'destroy']);
+                $fees->post('/{id}/create-invoice', [MediationFeeController::class, 'createInvoice']);
+            })->add(new AuditLogMiddleware('mediation_fee'));
+
+            // Fatura Yönetimi routes
+            $protected->group('/invoices', function (Group $invoices) {
+                $invoices->get('', [InvoiceController::class, 'index']);
+                $invoices->post('', [InvoiceController::class, 'store']);
+                $invoices->get('/stats', [InvoiceController::class, 'getStats']);
+                $invoices->get('/{id}', [InvoiceController::class, 'show']);
+                $invoices->put('/{id}', [InvoiceController::class, 'update']);
+                $invoices->delete('/{id}', [InvoiceController::class, 'destroy']);
+                $invoices->post('/{id}/payments', [InvoiceController::class, 'addPayment']);
+                $invoices->patch('/{id}/status', [InvoiceController::class, 'updateStatus']);
+                $invoices->get('/{id}/pdf', [InvoiceController::class, 'generatePdf']);
+                $invoices->post('/{id}/send', [InvoiceController::class, 'sendInvoice']);
+            })->add(new AuditLogMiddleware('invoice'));
+
+            // Arabulucu Ücret Hesaplama routes
+            $protected->group('/mediation-fees', function (Group $fees) {
+                $fees->post('/calculate', [MediationFeeController::class, 'calculate']);
+                $fees->post('', [MediationFeeController::class, 'store']);
+                $fees->get('', [MediationFeeController::class, 'index']);
+                $fees->get('/tariffs', [MediationFeeController::class, 'tariffs']);
+                $fees->get('/{id}', [MediationFeeController::class, 'show']);
+                $fees->delete('/{id}', [MediationFeeController::class, 'destroy']);
+                $fees->post('/{id}/create-invoice', [MediationFeeController::class, 'createInvoice']);
+            })->add(new AuditLogMiddleware('mediation_fee'));
+
+            // Fatura Yönetimi routes
+            $protected->group('/invoices', function (Group $invoices) {
+                $invoices->get('', [InvoiceController::class, 'index']);
+                $invoices->post('', [InvoiceController::class, 'store']);
+                $invoices->get('/stats', [InvoiceController::class, 'getStats']);
+                $invoices->get('/{id}', [InvoiceController::class, 'show']);
+                $invoices->put('/{id}', [InvoiceController::class, 'update']);
+                $invoices->delete('/{id}', [InvoiceController::class, 'destroy']);
+                $invoices->post('/{id}/payments', [InvoiceController::class, 'addPayment']);
+                $invoices->patch('/{id}/status', [InvoiceController::class, 'updateStatus']);
+                $invoices->get('/{id}/pdf', [InvoiceController::class, 'generatePdf']);
+                $invoices->post('/{id}/send', [InvoiceController::class, 'sendInvoice']);
+            })->add(new AuditLogMiddleware('invoice'));
 
         })->add(new AuthMiddleware());
     });
