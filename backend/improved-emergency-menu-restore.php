@@ -75,8 +75,8 @@ try {
                 'sort_order' => $item['sort_order'],
                 'is_active' => true,
                 'parent_id' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
             ];
             
             DB::table('menu_items')->insert($menuItem);
@@ -104,8 +104,8 @@ try {
                 'sort_order' => $item['sort_order'],
                 'is_active' => true,
                 'parent_id' => $mediationParent->id,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
             ];
             
             DB::table('menu_items')->insert($subMenuItem);
@@ -127,8 +127,8 @@ try {
                 'id' => $adminRoleId,
                 'key' => 'administrator',
                 'name' => 'Administrator',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
             ]);
             $adminRole = (object) ['id' => $adminRoleId];
             echo "✓ Created administrator role\n";
@@ -141,8 +141,8 @@ try {
                 'id' => $lawyerRoleId,
                 'key' => 'lawyer',
                 'name' => 'Avukat',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
             ]);
             $lawyerRole = (object) ['id' => $lawyerRoleId];
             echo "✓ Created lawyer role\n";
@@ -156,8 +156,8 @@ try {
                 'role_id' => $adminRole->id,
                 'menu_item_id' => $menuItem->id,
                 'is_visible' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
             ]);
         }
         echo "✓ Administrator permissions created\n";
@@ -187,8 +187,8 @@ try {
                 'role_id' => $lawyerRole->id,
                 'menu_item_id' => $menuItem->id,
                 'is_visible' => $isVisible,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
             ]);
         }
         echo "✓ Lawyer permissions created\n";

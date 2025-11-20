@@ -13,6 +13,8 @@ abstract class BaseModel extends Model
     protected $guarded = [];
     public $incrementing = false;
     protected $keyType = 'string';
+    
+    public $timestamps = true;
 
     protected static function boot()
     {
