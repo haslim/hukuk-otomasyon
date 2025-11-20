@@ -46,8 +46,8 @@ export const AppLayout = ({ children }: Props) => {
 
   return (
     <div className="relative flex min-h-screen w-full bg-[#F6F6F8] text-[#1A202C]">
-      <div className="hidden lg:flex lg:sticky lg:top-0 lg:h-screen">
-        <Sidebar />
+      <div className="hidden lg:flex lg:sticky lg:top-0 lg:h-screen lg:w-64">
+        <Sidebar className="will-change-transform transform-gpu backdrop-filter-none" />
       </div>
       <main className="flex-1 flex flex-col">
         <header className="flex flex-col gap-4 border-b border-[#E2E8F0] bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">

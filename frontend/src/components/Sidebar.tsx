@@ -143,7 +143,8 @@ export const Sidebar = ({ className = '', onLinkClick }: SidebarProps) => {
   if (loading) {
     return (
       <aside
-        className={`flex h-full w-64 flex-col bg-[#1A2234] text-[#E2E8F0] p-4 ${className}`}
+        className={`flex h-full w-64 flex-col bg-[#1A2234] text-[#E2E8F0] p-4 isolation-isolate ${className}`}
+        style={{ backgroundClip: 'padding-box', WebkitBackgroundClip: 'padding-box' }}
       >
         <div className="flex items-center gap-3 px-3 py-4 mb-6 border-b border-white/5">
           <div className="size-9 rounded-xl bg-[#2463eb]/10 flex items-center justify-center text-[#2463eb]">
@@ -165,7 +166,8 @@ export const Sidebar = ({ className = '', onLinkClick }: SidebarProps) => {
 
   return (
     <aside
-      className={`flex h-full w-64 flex-col bg-[#1A2234] text-[#E2E8F0] p-4 ${className}`}
+      className={`flex h-full w-64 flex-col bg-[#1A2234] text-[#E2E8F0] p-4 isolation-isolate ${className}`}
+      style={{ backgroundClip: 'padding-box', WebkitBackgroundClip: 'padding-box' }}
     >
       <div className="flex items-center gap-3 px-3 py-4 mb-6 border-b border-white/5">
         <div className="size-9 rounded-xl bg-[#2463eb]/10 flex items-center justify-center text-[#2463eb]">
