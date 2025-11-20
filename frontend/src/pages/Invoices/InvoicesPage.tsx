@@ -26,7 +26,7 @@ export const InvoicesPage = () => {
     data: stats,
     isLoading: statsLoading,
     refetch: refetchStats
-  } = useAsyncData<InvoiceStats>('invoice-stats', invoicesApi.getStats);
+  } = useAsyncData<InvoiceStats>(['invoice-stats'], invoicesApi.getStats);
 
   // Faturaları çek
   const {
@@ -35,8 +35,7 @@ export const InvoicesPage = () => {
     refetch: refetchInvoices
   } = useAsyncData<Invoice[]>(
     ['invoices', filters],
-    () => invoicesApi.index(filters),
-    { enabled: true }
+    () => invoicesApi.index(filters)
   );
 
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {

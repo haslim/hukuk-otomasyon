@@ -61,16 +61,21 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6">
           <div className="animate-pulse space-y-4">
-            {[...Array(5)].map((_, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <div className="h-12 bg-gray-200 rounded w-24"></div>
-                <div className="h-12 bg-gray-200 rounded w-32"></div>
-                <div className="h-12 bg-gray-200 rounded w-48"></div>
-                <div className="h-12 bg-gray-200 rounded w-24"></div>
-                <div className="h-12 bg-gray-200 rounded w-20"></div>
+            {/* Header row skeleton */}
+            <div className="flex space-x-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-4 bg-gray-200 rounded flex-1"></div>
+              ))}
+            </div>
+            {/* Data rows skeleton */}
+            {Array.from({ length: 5 }).map((_, rowIndex) => (
+              <div key={rowIndex} className="flex space-x-4 mt-3">
+                {Array.from({ length: 6 }).map((_, colIndex) => (
+                  <div key={colIndex} className="h-8 bg-gray-200 rounded flex-1"></div>
+                ))}
               </div>
             ))}
           </div>
@@ -79,148 +84,122 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
     );
   }
 
-  if (invoices.length === 0) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="p-4 bg-gray-100 rounded-full">
-            <span className="material-symbols-outlined text-4xl text-gray-400">receipt</span>
-          </div>
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">Henüz fatura bulunmuyor</h3>
-            <p className="text-gray-600">İlk faturanızı oluşturmak için "Yeni Fatura" butonuna tıklayın.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Faturalar ({invoices.length})
-          </h2>
-          <button
-            onClick={onRefresh}
-            className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <span className="material-symbols-outlined text-sm">refresh</span>
-            Yenile
-          </button>
-        </div>
-      </div>
-
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Fatura No
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Müşteri
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tarih
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Vade
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Tutar
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Durum
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Vade Tarihi
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 İşlemler
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {invoices.map((invoice) => (
-              <tr key={invoice.id} className="hover:bg-gray-50 cursor-pointer transition-colors">
-                <td 
-                  className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          <tbody className="divide-y divide-gray-200">
+            {invoices.length > 0 ? (
+              invoices.map((invoice) => (
+                <tr 
+                  key={invoice.id}
+                  className="hover:bg-gray-50 cursor-pointer transition-colors"
                   onClick={() => onInvoiceClick(invoice)}
                 >
-                  {invoice.invoice_number}
-                </td>
-                <td 
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                  onClick={() => onInvoiceClick(invoice)}
-                >
-                  {invoice.client?.name || `ID: ${invoice.client_id}`}
-                </td>
-                <td 
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-600"
-                  onClick={() => onInvoiceClick(invoice)}
-                >
-                  {formatDate(invoice.issue_date)}
-                </td>
-                <td 
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-600"
-                  onClick={() => onInvoiceClick(invoice)}
-                >
-                  {formatDate(invoice.due_date)}
-                </td>
-                <td 
-                  className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                  onClick={() => onInvoiceClick(invoice)}
-                >
-                  {formatCurrency(invoice.total_amount)}
-                </td>
-                <td 
-                  className="px-6 py-4 whitespace-nowrap"
-                  onClick={() => onInvoiceClick(invoice)}
-                >
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(invoice.status)}`}>
-                    {getStatusLabel(invoice.status)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => onInvoiceClick(invoice)}
-                      className="text-primary hover:text-primary/80 transition-colors"
-                      title="Görüntüle"
-                    >
-                      <span className="material-symbols-outlined text-lg">visibility</span>
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // PDF indir fonksiyonu çağrılacak
-                        console.log('PDF indir:', invoice.id);
-                      }}
-                      className="text-gray-600 hover:text-gray-800 transition-colors"
-                      title="PDF İndir"
-                    >
-                      <span className="material-symbols-outlined text-lg">download</span>
-                    </button>
-                    {invoice.status === 'draft' && (
+                  <td className="px-4 py-3 text-sm font-medium">
+                    {invoice.invoice_number}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <div>
+                      <div className="font-medium">{invoice.client?.name || `Müşteri ID: ${invoice.client_id}`}</div>
+                      {invoice.case_id && (
+                        <div className="text-xs text-gray-500">Dosya #{invoice.case_id}</div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium">
+                    {formatCurrency(invoice.total_amount)}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(invoice.status)}`}>
+                      {getStatusLabel(invoice.status)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {formatDate(invoice.due_date)}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <div className="flex space-x-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          // E-posta gönder fonksiyonu çağrılacak
-                          console.log('E-posta gönder:', invoice.id);
+                          // Ödeme detayı modalı açılacak
+                          onInvoiceClick(invoice);
                         }}
                         className="text-blue-600 hover:text-blue-800 transition-colors"
-                        title="E-posta Gönder"
+                        title="Detayları Görüntüle"
                       >
-                        <span className="material-symbols-outlined text-lg">send</span>
+                        <span className="material-symbols-outlined text-sm">visibility</span>
                       </button>
-                    )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // PDF indirme fonksiyonu
+                          console.log('PDF indir:', invoice.id);
+                        }}
+                        className="text-gray-600 hover:text-gray-800 transition-colors"
+                        title="PDF İndir"
+                      >
+                        <span className="material-symbols-outlined text-sm">download</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center">
+                  <div className="flex flex-col items-center">
+                    <span className="material-symbols-outlined text-4xl text-gray-300 mb-3">receipt_long</span>
+                    <p className="text-gray-500 text-lg font-medium">Fatura bulunamadı</p>
+                    <p className="text-gray-400 text-sm mt-1">
+                      Belirtilen kriterlere uygun fatura kaydı bulunmamaktadır.
+                    </p>
                   </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
+      </div>
+
+      {/* Footer with refresh button */}
+      <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            {invoices.length > 0 && `Toplam ${invoices.length} fatura`}
+          </div>
+          <button
+            onClick={onRefresh}
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm">refresh</span>
+            Yenile
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoint Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Endpoint Verification Test</h1>
+    <p>This page tests the API endpoints to verify they work correctly after deployment.</p>
+    
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        const API_BASE = 'https://backend.bgaofis.billurguleraslim.av.tr/api';
+        
+        function addResult(test, status, message, details = null) {
+            const div = document.createElement('div');
+            div.className = `test-result ${status}`;
+            div.innerHTML = `
+                <strong>${test}:</strong> ${message}
+                ${details ? `<pre>${JSON.stringify(details, null, 2)}</pre>` : ''}
+            `;
+            results.appendChild(div);
+        }
+        
+        async function testEndpoint(method, url, data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://bgaofis.billurguleraslim.av.tr'
+                }
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                const responseData = await response.json();
+                
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data: responseData,
+                    headers: {
+                        'access-control-allow-origin': response.headers.get('access-control-allow-origin'),
+                        'access-control-allow-methods': response.headers.get('access-control-allow-methods'),
+                        'access-control-allow-headers': response.headers.get('access-control-allow-headers')
+                    }
+                };
+            } catch (error) {
+                return {
+                    error: error.message,
+                    status: 0,
+                    ok: false
+                };
+            }
+        }
+        
+        async function runTests() {
+            addResult('Test Setup', 'info', 'Starting API endpoint verification tests...');
+            
+            // Test 1: Mediation Fees Tariffs
+            const tariffsTest = await testEndpoint('GET', `${API_BASE}/mediation-fees/tariffs`);
+            if (tariffsTest.status === 401) {
+                addResult('GET /api/mediation-fees/tariffs', 'success', 
+                    '✅ Endpoint accessible (401 Unauthorized expected without auth token)', 
+                    { status: tariffsTest.status, cors: tariffsTest.headers });
+            } else {
+                addResult('GET /api/mediation-fees/tariffs', 'error', 
+                    '❌ Unexpected response', tariffsTest);
+            }
+            
+            // Test 2: Mediation Fees List
+            const feesTest = await testEndpoint('GET', `${API_BASE}/mediation-fees`);
+            if (feesTest.status === 401) {
+                addResult('GET /api/mediation-fees', 'success', 
+                    '✅ Endpoint accessible (401 Unauthorized expected without auth token)', 
+                    { status: feesTest.status, cors: feesTest.headers });
+            } else {
+                addResult('GET /api/mediation-fees', 'error', 
+                    '❌ Unexpected response', feesTest);
+            }
+            
+            // Test 3: Mediation Fees Calculate
+            const calculateTest = await testEndpoint('POST', `${API_BASE}/mediation-fees/calculate`, {
+                calculation_type: 'standard',
+                party_count: 2,
+                subject_value: 10000
+            });
+            if (calculateTest.status === 401) {
+                addResult('POST /api/mediation-fees/calculate', 'success', 
+                    '✅ Endpoint accessible (401 Unauthorized expected without auth token)', 
+                    { status: calculateTest.status, cors: calculateTest.headers });
+            } else {
+                addResult('POST /api/mediation-fees/calculate', 'error', 
+                    '❌ Unexpected response', calculateTest);
+            }
+            
+            // Test 4: Invoice Stats
+            const invoiceStatsTest = await testEndpoint('GET', `${API_BASE}/invoices/stats`);
+            if (invoiceStatsTest.status === 401) {
+                addResult('GET /api/invoices/stats', 'success', 
+                    '✅ Endpoint accessible (401 Unauthorized expected without auth token)', 
+                    { status: invoiceStatsTest.status, cors: invoiceStatsTest.headers });
+            } else {
+                addResult('GET /api/invoices/stats', 'error', 
+                    '❌ Unexpected response', invoiceStatsTest);
+            }
+            
+            // Test 5: OPTIONS request (CORS preflight)
+            const optionsTest = await testEndpoint('OPTIONS', `${API_BASE}/mediation-fees/calculate`);
+            if (optionsTest.status === 200) {
+                addResult('OPTIONS /api/mediation-fees/calculate', 'success', 
+                    '✅ CORS preflight working correctly', 
+                    { status: optionsTest.status, cors: optionsTest.headers });
+            } else {
+                addResult('OPTIONS /api/mediation-fees/calculate', 'error', 
+                    '❌ CORS preflight failed', optionsTest);
+            }
+            
+            // Test 6: Test for duplicate /api/ paths (should fail)
+            const duplicatePathTest = await testEndpoint('GET', `${API_BASE}/api/mediation-fees/tariffs`);
+            if (duplicatePathTest.status === 404 || duplicatePathTest.status === 0) {
+                addResult('GET /api/api/mediation-fees/tariffs', 'success', 
+                    '✅ Duplicate /api/ path correctly returns 404 (as expected)', 
+                    { status: duplicatePathTest.status });
+            } else {
+                addResult('GET /api/api/mediation-fees/tariffs', 'error', 
+                    '❌ Duplicate path should return 404', duplicatePathTest);
+            }
+            
+            addResult('Test Summary', 'info', 'All tests completed. Check results above.');
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+        
+        // Log any console errors
+        window.addEventListener('error', function(e) {
+            addResult('JavaScript Error', 'error', `Error: ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+        
+        // Log unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(e) {
+            addResult('Unhandled Promise Rejection', 'error', `Promise rejected: ${e.reason}`);
+        });
+    </script>
+</body>
+</html>

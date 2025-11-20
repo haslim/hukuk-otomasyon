@@ -74,6 +74,8 @@ export interface InvoiceStats {
   sent_invoices: number;
   paid_invoices: number;
   overdue_invoices: number;
+  overdue_count: number;
+  this_month_count: number;
   total_amount: number;
   paid_amount: number;
   unpaid_amount: number;
@@ -89,61 +91,62 @@ export const invoicesApi = {
     date_to?: string;
     search?: string;
   }) => {
-    const response = await apiClient.get('/api/invoices', { params: filters });
+    const response = await apiClient.get('/invoices', { params: filters });
     return response.data;
   },
 
   // Yeni fatura oluştur
   store: async (data: InvoiceRequest) => {
-    const response = await apiClient.post('/api/invoices', data);
+    const response = await apiClient.post('/invoices', data);
     return response.data;
   },
 
   // Fatura detayı
   show: async (id: string) => {
-    const response = await apiClient.get(`/api/invoices/${id}`);
+    const response = await apiClient.get(`/invoices/${id}`);
     return response.data;
   },
 
   // Fatura güncelle
   update: async (id: string, data: Partial<InvoiceRequest>) => {
-    const response = await apiClient.put(`/api/invoices/${id}`, data);
+    const response = await apiClient.put(`/invoices/${id}`, data);
     return response.data;
   },
 
   // Fatura sil
   destroy: async (id: string) => {
-    const response = await apiClient.delete(`/api/invoices/${id}`);
+    const response = await apiClient.delete(`/invoices/${id}`);
     return response.data;
   },
 
   // Ödeme ekle
-  addPayment: async (id: string, data: {
+  addPayment: async (data: {
+    invoice_id: string;
     amount: number;
     payment_date: string;
     payment_method: 'cash' | 'bank_transfer' | 'credit_card' | 'check';
     payment_reference?: string;
     notes?: string;
   }) => {
-    const response = await apiClient.post(`/api/invoices/${id}/payments`, data);
+    const response = await apiClient.post(`/invoices/${data.invoice_id}/payments`, data);
     return response.data;
   },
 
   // Durum güncelle
   updateStatus: async (id: string, status: string) => {
-    const response = await apiClient.patch(`/api/invoices/${id}/status`, { status });
+    const response = await apiClient.patch(`/invoices/${id}/status`, { status });
     return response.data;
   },
 
   // İstatistikler
   getStats: async () => {
-    const response = await apiClient.get('/api/invoices/stats');
+    const response = await apiClient.get('/invoices/stats');
     return response.data;
   },
 
   // PDF oluştur
   generatePdf: async (id: string) => {
-    const response = await apiClient.get(`/api/invoices/${id}/pdf`);
+    const response = await apiClient.get(`/invoices/${id}/pdf`);
     return response.data;
   },
 
@@ -153,7 +156,7 @@ export const invoicesApi = {
     subject?: string;
     message?: string;
   }) => {
-    const response = await apiClient.post(`/api/invoices/${id}/send`, data);
+    const response = await apiClient.post(`/invoices/${id}/send`, data);
     return response.data;
   }
 };
