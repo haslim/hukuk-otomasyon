@@ -5,6 +5,9 @@
  * This bypasses all Slim middleware to test authentication directly
  */
 
+// Load autoloader
+require_once __DIR__ . '/../vendor/autoload.php';
+
 // Enable all error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
