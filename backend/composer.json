@@ -8,6 +8,7 @@
     "slim/psr7": "^1.6",
     "firebase/php-jwt": "^6.10",
     "illuminate/database": "^10.0",
+    "illuminate/pagination": "^10.0",
     "vlucas/phpdotenv": "^5.5",
     "respect/validation": "^2.3",
     "ramsey/uuid": "^4.7",

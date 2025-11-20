@@ -6,7 +6,7 @@ use App\Repositories\ArbitrationRepository;
 use App\Support\AuthContext;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Illuminate\Http\UploadedFile;
+use Psr\Http\Message\UploadedFileInterface;
 
 class ArbitrationController extends Controller
 {

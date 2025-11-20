@@ -6,7 +6,7 @@ use App\Models\ArbitrationApplication;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationTimeline;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\UploadedFile;
+use Psr\Http\Message\UploadedFileInterface;
 
 class ArbitrationRepository extends BaseRepository
 {
@@ -66,7 +66,7 @@ class ArbitrationRepository extends BaseRepository
     public function createApplication(array $data): ArbitrationApplication
     {
         $data['application_no'] = ArbitrationApplication::generateApplicationNo();
-        $data['application_date'] = $data['application_date'] ?? now()->toDateString();
+        $data['application_date'] ??= \Carbon\Carbon::now()->toDateString();
         $data['status'] = 'pending';
         $data['created_by'] = auth()->id();
 
@@ -193,7 +193,7 @@ class ArbitrationRepository extends BaseRepository
     }
 
     // Belge işlemleri
-    public function addDocument(string $applicationId, UploadedFile $file, array $data): ApplicationDocument
+    public function addDocument(string $applicationId, UploadedFileInterface $file, array $data): ApplicationDocument
     {
         $application = $this->model::find($applicationId);
         
@@ -202,16 +202,27 @@ class ArbitrationRepository extends BaseRepository
         }
 
         // Dosyayı yükle
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs('arbitration_documents', $fileName, 'public');
+        $clientFileName = $file->getClientFilename() ?? 'unknown_file';
+        $fileName = time() . '_' . $clientFileName;
+        
+        // PSR-7 dosyasını geçici dosyaya taşı
+        $tempPath = sys_get_temp_dir() . '/' . $fileName;
+        $file->moveTo($tempPath);
+        
+        // Laravel Storage kullanarak dosyayı kopyala
+        $filePath = 'arbitration_documents/' . $fileName;
+        \Illuminate\Support\Facades\Storage::disk('public')->put($filePath, file_get_contents($tempPath));
+        
+        // Geçici dosyayı temizle
+        unlink($tempPath);
 
         $documentData = [
             'application_id' => $applicationId,
             'document_type' => $data['document_type'] ?? 'diger',
-            'title' => $data['title'] ?? $file->getClientOriginalName(),
+            'title' => $data['title'] ?? $clientFileName,
             'file_path' => $filePath,
             'file_size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
+            'mime_type' => $file->getClientMediaType() ?? 'application/octet-stream',
             'is_public' => $data['is_public'] ?? false,
             'uploaded_by' => auth()->id(),
         ];
@@ -302,13 +313,13 @@ class ArbitrationRepository extends BaseRepository
         $rejected = $this->model::byStatus('rejected')->count();
 
         // Bu ayki başvurular
-        $thisMonth = $this->model::whereMonth('application_date', now()->month)
-            ->whereYear('application_date', now()->year)
+        $thisMonth = $this->model::whereMonth('application_date', \Carbon\Carbon::now()->month)
+            ->whereYear('application_date', \Carbon\Carbon::now()->year)
             ->count();
 
         // Geçen ayki başvurular
-        $lastMonth = $this->model::whereMonth('application_date', now()->subMonth()->month)
-            ->whereYear('application_date', now()->subMonth()->year)
+        $lastMonth = $this->model::whereMonth('application_date', \Carbon\Carbon::now()->subMonth()->month)
+            ->whereYear('application_date', \Carbon\Carbon::now()->subMonth()->year)
             ->count();
 
         // Başvuru tiplerine göre dağılım

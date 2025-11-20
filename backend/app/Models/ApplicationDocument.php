@@ -130,8 +130,12 @@ class ApplicationDocument extends Model
     // Dosya işlemleri
     public function getFilePath(): string
     {
-        // Storage facade kullanarak dosya yolunu al
-        return Storage::disk('local')->path('public/' . $this->file_path);
+        // Storage path'i doğru şekilde al - Laravel Storage'da path() methodu yok
+        $disk = Storage::disk('local');
+        $adapter = $disk->getAdapter();
+        $pathPrefix = method_exists($adapter, 'getPathPrefix') ? $adapter->getPathPrefix() : storage_path('app');
+        
+        return $pathPrefix . '/public/' . $this->file_path;
     }
 
     public function fileExists(): bool
