@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
+
 class MediationFeeTariff extends BaseModel
 {
     protected $table = 'mediation_fee_tariffs';
@@ -81,7 +83,7 @@ class MediationFeeTariff extends BaseModel
         return $query->where('is_active', true)
                     ->where(function ($q) {
                         $q->whereNull('valid_to')
-                          ->orWhere('valid_to', '>=', now());
+                          ->orWhere('valid_to', '>=', Carbon::now());
                     });
     }
 

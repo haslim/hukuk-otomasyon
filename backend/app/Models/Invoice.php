@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
+
 class Invoice extends BaseModel
 {
     protected $table = 'invoices';
@@ -129,7 +131,7 @@ class Invoice extends BaseModel
 
     public function isOverdue()
     {
-        return $this->status === 'sent' && $this->due_date < now() && $this->paid_amount < $this->total_amount;
+        return $this->status === 'sent' && $this->due_date < Carbon::now() && $this->paid_amount < $this->total_amount;
     }
 
     public function isPaid()
@@ -150,7 +152,7 @@ class Invoice extends BaseModel
 
     public function scopeOverdue($query)
     {
-        return $query->where('due_date', '<', now())
+        return $query->where('due_date', '<', Carbon::now())
                     ->where('paid_amount', '<', 'total_amount')
                     ->where('status', 'sent');
     }

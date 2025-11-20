@@ -1,10 +1,11 @@
-<?php
+gi<?php
 
 namespace App\Services;
 
 use App\Models\MediationFeeCalculation;
 use App\Models\MediationFeeTariff;
 use App\Repositories\BaseRepository;
+use Illuminate\Support\Carbon;
 
 class MediationFeeService
 {
@@ -141,10 +142,16 @@ class MediationFeeService
         
         $calculationData['case_id'] = $data['case_id'] ?? null;
         $calculationData['client_id'] = $data['client_id'] ?? null;
-        $calculationData['calculation_date'] = now()->toDateString();
+        $calculationData['calculation_date'] = Carbon::now()->toDateString();
         $calculationData['created_by'] = $data['created_by'] ?? null;
 
-        return $this->repository->create($calculationData);
+        $calculation = $this->repository->create($calculationData);
+        
+        if (!($calculation instanceof MediationFeeCalculation)) {
+            throw new \Exception('Hesaplama kaydedilemedi - yanlış veri tipi');
+        }
+
+        return $calculation;
     }
 
     public function getCalculations(array $filters = []): array

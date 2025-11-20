@@ -32,8 +32,8 @@ class InvoiceService
             'calculation_id' => $data['calculation_id'] ?? null,
             'client_id' => $data['client_id'],
             'case_id' => $data['case_id'] ?? null,
-            'issue_date' => $data['issue_date'] ?? now()->toDateString(),
-            'due_date' => $data['due_date'] ?? now()->addDays(30)->toDateString(),
+            'issue_date' => $data['issue_date'] ?? Carbon::now()->toDateString(),
+            'due_date' => $data['due_date'] ?? Carbon::now()->addDays(30)->toDateString(),
             'status' => $data['status'] ?? 'draft',
             'subtotal' => $data['subtotal'] ?? 0,
             'vat_rate' => $data['vat_rate'] ?? 18,
@@ -82,8 +82,8 @@ class InvoiceService
             'calculation_id' => $calculationId,
             'client_id' => $additionalData['client_id'] ?? $calculation->client_id,
             'case_id' => $additionalData['case_id'] ?? $calculation->case_id,
-            'issue_date' => $additionalData['issue_date'] ?? now()->toDateString(),
-            'due_date' => $additionalData['due_date'] ?? now()->addDays(30)->toDateString(),
+            'issue_date' => $additionalData['issue_date'] ?? Carbon::now()->toDateString(),
+            'due_date' => $additionalData['due_date'] ?? Carbon::now()->addDays(30)->toDateString(),
             'status' => $additionalData['status'] ?? 'draft',
             'subtotal' => $calculation->base_fee,
             'vat_rate' => $calculation->vat_rate,
@@ -325,7 +325,7 @@ class InvoiceService
         $sent = $query->where('status', 'sent')->count();
         $paid = $query->where('status', 'paid')->count();
         $overdue = $query->where('status', 'sent')
-                         ->where('due_date', '<', now())
+                         ->where('due_date', '<', Carbon::now())
                          ->count();
 
         $totalAmount = $this->invoiceRepository->sumWhere('total_amount', []);
