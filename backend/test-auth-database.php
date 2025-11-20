@@ -15,12 +15,6 @@ if (file_exists($envPath . '/.env')) {
     Dotenv::createImmutable($envPath)->safeLoad();
 }
 
-$appEnv = $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? getenv('APP_ENV') ?? 'production';
-$envFile = ".env.$appEnv";
-if ($appEnv && file_exists($envPath . '/' . $envFile)) {
-    Dotenv::createImmutable($envPath, $envFile)->safeLoad();
-}
-
 echo "=== Authentication Database Test ===\n\n";
 
 // Test database connection
