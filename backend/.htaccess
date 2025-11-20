@@ -1,5 +1,10 @@
 RewriteEngine On
 
-# Redirect all requests to the public directory
+# Redirect all requests to the public directory except for API routes
 RewriteCond %{REQUEST_URI} !^/public/
+RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^(.*)$ public/$1 [L]
+
+# Handle API routes directly through index.php
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ public/index.php [QSA,L]
