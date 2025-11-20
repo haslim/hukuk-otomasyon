@@ -7,6 +7,8 @@ use App\Models\InvoiceItem;
 use App\Models\InvoicePayment;
 use App\Models\MediationFeeCalculation;
 use App\Repositories\BaseRepository;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class InvoiceService
 {
@@ -43,6 +45,10 @@ class InvoiceService
         ];
 
         $invoice = $this->invoiceRepository->create($invoiceData);
+
+        if (!$invoice) {
+            throw new \Exception('Fatura oluşturulamadı');
+        }
 
         // Fatura kalemlerini ekle
         if (isset($data['items']) && is_array($data['items'])) {
@@ -118,7 +124,13 @@ class InvoiceService
             $itemData['vat_amount'] = $itemData['line_total'] * ($itemData['vat_rate'] / 100);
         }
 
-        return $this->itemRepository->create($itemData);
+        $item = $this->itemRepository->create($itemData);
+        
+        if (!$item) {
+            throw new \Exception('Fatura kalemi oluşturulamadı');
+        }
+
+        return $item;
     }
 
     public function updateInvoice(string $id, array $data): Invoice
@@ -148,7 +160,13 @@ class InvoiceService
 
         $data['updated_by'] = $data['updated_by'] ?? null;
 
-        return $this->invoiceRepository->update($id, $data);
+        $updatedInvoice = $this->invoiceRepository->update($id, $data);
+        
+        if (!$updatedInvoice) {
+            throw new \Exception('Fatura güncellenemedi');
+        }
+
+        return $updatedInvoice;
     }
 
     public function getInvoiceById(string $id): ?Invoice
@@ -225,6 +243,10 @@ class InvoiceService
 
         $paymentData['invoice_id'] = $invoiceId;
         $payment = $this->paymentRepository->create($paymentData);
+
+        if (!$payment) {
+            throw new \Exception('Ödeme oluşturulamadı');
+        }
 
         // Fatura durumunu güncelle
         $this->updateInvoiceStatus($invoiceId);
@@ -323,6 +345,12 @@ class InvoiceService
             throw new \Exception('Bu durum geçişi yapılamaz');
         }
 
-        return $this->invoiceRepository->update($id, ['status' => $status]);
+        $updatedInvoice = $this->invoiceRepository->update($id, ['status' => $status]);
+        
+        if (!$updatedInvoice) {
+            throw new \Exception('Fatura durumu güncellenemedi');
+        }
+
+        return $updatedInvoice;
     }
 }

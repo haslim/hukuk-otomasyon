@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { mediationFeesApi, MediationFeeRequest, MediationFeeCalculation, MediationFeeTariff } from '../api/modules/mediationFees';
 import { invoicesApi } from '../api/modules/invoices';
-import { clientApi } from '../api/modules/clients';
-import { caseApi } from '../api/modules/cases';
+import { ClientApi } from '../api/modules/clients';
+import { CaseApi } from '../api/modules/cases';
 
 const MediationFeeCalculatorPage: React.FC = () => {
   const [requestData, setRequestData] = useState<MediationFeeRequest>({
@@ -29,8 +29,8 @@ const MediationFeeCalculatorPage: React.FC = () => {
   const loadData = async () => {
     try {
       const [clientsData, casesData, tariffsData, calculationsData] = await Promise.all([
-        clientApi.index(),
-        caseApi.index(),
+        ClientApi.list(),
+        CaseApi.list(),
         mediationFeesApi.tariffs(),
         mediationFeesApi.index()
       ]);
@@ -326,7 +326,7 @@ const MediationFeeCalculatorPage: React.FC = () => {
                 <div className="mt-4 p-4 bg-gray-50 rounded-md">
                   <h4 className="font-medium mb-2">Hesaplama Adımları:</h4>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700">
-                    {result.calculation_details.calculation_steps.map((step, index) => (
+                    {result.calculation_details.calculation_steps.map((step: string, index: number) => (
                       <li key={index}>{step}</li>
                     ))}
                   </ol>
