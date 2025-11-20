@@ -58,7 +58,7 @@ class MenuController extends Controller
 
         \DB::transaction(function () use ($role, $permissions) {
             // Mevcut tüm izinleri sil
-            MenuPermission::where('role_id', $role->id)->delete();
+            MenuPermission::where('role_id', $role->getKey())->delete();
 
             // Yeni izinleri ekle
             foreach ($permissions as $permission) {
@@ -70,7 +70,7 @@ class MenuController extends Controller
                     $menuItem = MenuItem::find($menuItemId);
                     if ($menuItem) {
                         MenuPermission::create([
-                            'role_id' => $role->id,
+                            'role_id' => $role->getKey(),
                             'menu_item_id' => $menuItemId,
                             'is_visible' => $isVisible,
                         ]);
@@ -134,7 +134,7 @@ class MenuController extends Controller
         });
 
         return $this->json($response, [
-            'id' => $menuItem->id,
+            'id' => $menuItem->getKey(),
             'path' => $menuItem->path,
             'label' => $menuItem->label,
             'icon' => $menuItem->icon,
@@ -154,7 +154,7 @@ class MenuController extends Controller
         }
 
         return $this->json($response, [
-            'id' => $menuItem->id,
+            'id' => $menuItem->getKey(),
             'path' => $menuItem->path,
             'label' => $menuItem->label,
             'icon' => $menuItem->icon,
@@ -197,7 +197,7 @@ class MenuController extends Controller
         $menuItem->save();
 
         return $this->json($response, [
-            'id' => $menuItem->id,
+            'id' => $menuItem->getKey(),
             'path' => $menuItem->path,
             'label' => $menuItem->label,
             'icon' => $menuItem->icon,
@@ -226,29 +226,23 @@ class MenuController extends Controller
      */
     private function buildHierarchicalMenu(Collection $menuItems, ?Role $role = null): array
     {
-        $menuArray = $menuItems->map(function (MenuItem $item) use ($role) {
-            $menuItemData = [
-                'id' => $item->id,
-                'path' => $item->path,
-                'label' => $item->label,
-                'icon' => $item->icon,
-                'sortOrder' => $item->sort_order,
-                'isActive' => $item->is_active,
-                'parentId' => $item->parent_id,
-                'createdAt' => $item->created_at ? $item->created_at->toDateTimeString() : null,
-                'updatedAt' => $item->updated_at ? $item->updated_at->toDateTimeString() : null,
-            ];
-
+        $menuArray = $menuItems->map(fn (MenuItem $item) => [
+            'id' => $item->getKey(),
+            'path' => $item->path,
+            'label' => $item->label,
+            'icon' => $item->icon,
+            'sortOrder' => $item->sort_order,
+            'isActive' => $item->is_active,
+            'parentId' => $item->parent_id,
+            'createdAt' => $item->created_at ? $item->created_at->toDateTimeString() : null,
+            'updatedAt' => $item->updated_at ? $item->updated_at->toDateTimeString() : null,
             // If role is provided, check visibility
-            if ($role) {
-                $permission = $item->menuPermissions()
-                    ->where('role_id', $role->id)
-                    ->first();
-                $menuItemData['isVisible'] = $permission ? $permission->is_visible : false;
-            }
-
-            return $menuItemData;
-        })->values()->all();
+            'isVisible' => $role ? (
+                ($permission = $item->menuPermissions()
+                    ->where('role_id', $role->getKey())
+                    ->first()) ? $permission->is_visible : false
+            ) : null,
+        ])->values()->all();
 
         // Build hierarchical structure
         $indexed = [];
@@ -280,9 +274,7 @@ class MenuController extends Controller
      */
     private function sortMenuItemsRecursive(array &$items): void
     {
-        usort($items, function ($a, $b) {
-            return $a['sortOrder'] - $b['sortOrder'];
-        });
+        usort($items, fn ($a, $b) => $a['sortOrder'] - $b['sortOrder']);
 
         foreach ($items as &$item) {
             if (!empty($item['children'])) {
