@@ -22,6 +22,7 @@ import { SettingsPage } from '../pages/SettingsPage';
 import ArbitrationListPage from '../pages/Arbitration/ArbitrationListPage';
 import ArbitrationDashboardPage from '../pages/Arbitration/ArbitrationDashboardPage';
 import MediationFeeCalculatorPage from '../pages/MediationFeeCalculatorPage';
+import { InvoicesPage } from '../pages/Invoices/InvoicesPage';
 
 export const AppRoutes = () => (
   <Routes>
@@ -49,6 +50,6 @@ export const AppRoutes = () => (
     <Route path="/arbitration" element={<ArbitrationListPage />} />
     <Route path="/arbitration/dashboard" element={<ArbitrationDashboardPage />} />
     <Route path="/mediation/fee-calculator" element={<MediationFeeCalculatorPage />} />
-    <Route path="/invoices" element={<div>Fatura Yönetimi Sayfası (Yakında)</div>} />
+    <Route path="/invoices" element={<InvoicesPage />} />
   </Routes>
 );

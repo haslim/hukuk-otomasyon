@@ -44,13 +44,13 @@ export interface MediationFeeTariff {
 export const mediationFeesApi = {
   // Hesaplama yap
   calculate: async (data: MediationFeeRequest) => {
-    const response = await apiClient.post('/api/mediation-fees/calculate', data);
+    const response = await apiClient.post('/mediation-fees/calculate', data);
     return response.data;
   },
 
   // Hesaplamayı kaydet
   store: async (data: MediationFeeRequest) => {
-    const response = await apiClient.post('/api/mediation-fees', data);
+    const response = await apiClient.post('/mediation-fees', data);
     return response.data;
   },
 
@@ -62,25 +62,25 @@ export const mediationFeesApi = {
     date_from?: string;
     date_to?: string;
   }) => {
-    const response = await apiClient.get('/api/mediation-fees', { params: filters });
+    const response = await apiClient.get('/mediation-fees', { params: filters });
     return response.data;
   },
 
   // Tek hesaplama getir
   show: async (id: string) => {
-    const response = await apiClient.get(`/api/mediation-fees/${id}`);
+    const response = await apiClient.get(`/mediation-fees/${id}`);
     return response.data;
   },
 
   // Hesaplamayı sil
   destroy: async (id: string) => {
-    const response = await apiClient.delete(`/api/mediation-fees/${id}`);
+    const response = await apiClient.delete(`/mediation-fees/${id}`);
     return response.data;
   },
 
   // Tarifeleri getir
   tariffs: async () => {
-    const response = await apiClient.get('/api/mediation-fees/tariffs');
+    const response = await apiClient.get('/mediation-fees/tariffs');
     return response.data;
   },
 
@@ -94,7 +94,7 @@ export const mediationFeesApi = {
     notes?: string;
     client_details?: any;
   }) => {
-    const response = await apiClient.post(`/api/mediation-fees/${id}/create-invoice`, data);
+    const response = await apiClient.post(`/mediation-fees/${id}/create-invoice`, data);
     return response.data;
   }
 };
