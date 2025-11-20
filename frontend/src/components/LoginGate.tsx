@@ -16,11 +16,34 @@ export const LoginGate = ({ children }: Props) => {
 
   const mapUserPayload = (payload: any): AuthUser => {
     const roles = Array.isArray(payload?.roles)
-      ? payload.roles.map((role: any) => (typeof role === 'string' ? role : role?.name ?? String(role)))
+      ? payload.roles.map((role: any) => {
+          // If role is already an object with the correct structure, use it as-is
+          if (typeof role === 'object' && role !== null && role.id && role.name && role.key) {
+            return {
+              id: String(role.id),
+              name: String(role.name),
+              key: String(role.key)
+            };
+          }
+          // If role is a string, convert it to the expected object structure
+          if (typeof role === 'string') {
+            return {
+              id: role,
+              name: role,
+              key: role.toLowerCase()
+            };
+          }
+          // Fallback for other cases
+          return {
+            id: String(role?.id || role),
+            name: String(role?.name || role),
+            key: String(role?.key || role?.name?.toLowerCase() || String(role).toLowerCase())
+          };
+        })
       : undefined;
 
     return {
-      id: payload?.id ?? '',
+      id: String(payload?.id ?? ''),
       name: payload?.name ?? '',
       email: payload?.email ?? '',
       title: payload?.title ?? null,
