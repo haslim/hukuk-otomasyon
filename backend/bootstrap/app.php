@@ -75,4 +75,28 @@ $app->addErrorMiddleware(
     true
 );
 
+// Add detailed error handling for debugging
+$app->add(function($request, $handler) {
+    try {
+        return $handler->handle($request);
+    } catch (Exception $e) {
+        // Log the error
+        error_log("Slim Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        
+        // Return detailed error response
+        $response = $handler->handle($request);
+        $response->getBody()->rewind();
+        $response->getBody()->write(json_encode([
+            'message' => 'Application Error: ' . $e->getMessage(),
+            'file' => basename($e->getFile()),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]));
+        
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
 return $app;
