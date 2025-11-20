@@ -69,11 +69,12 @@ $app->add(function ($request, $handler) {
         ->withHeader('Access-Control-Max-Age', '86400'); // 24 hours
 });
 
-$app->addErrorMiddleware(
-    $config['debug'] ?? false,
-    true,
-    true
-);
+// Disable built-in error middleware to use our custom error handling
+// $app->addErrorMiddleware(
+//     $config['debug'] ?? false,
+//     true,
+//     true
+// );
 
 // Add detailed error handling for debugging
 $app->add(function($request, $handler) {
