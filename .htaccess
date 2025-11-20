@@ -6,6 +6,11 @@ RewriteEngine On
 
 # API routes go to backend
 RewriteCond %{REQUEST_URI} ^/api/
+
+# Special route for auth login to bypass Slim issues
+RewriteRule ^api/auth/login$ backend/direct-login-bypass.php [QSA,L]
+
+# All other API routes to backend
 RewriteRule ^api/(.*)$ backend/public/index.php [QSA,L]
 
 # All other requests go to frontend (index.html)
