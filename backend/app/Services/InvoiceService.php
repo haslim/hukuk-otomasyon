@@ -50,6 +50,11 @@ class InvoiceService
             throw new \Exception('Fatura oluşturulamadı');
         }
 
+        // Ensure we return the correct type
+        if (!($invoice instanceof Invoice)) {
+            throw new \Exception('Fatura oluşturulamadı - yanlış veri tipi');
+        }
+
         // Fatura kalemlerini ekle
         if (isset($data['items']) && is_array($data['items'])) {
             foreach ($data['items'] as $itemData) {
@@ -130,6 +135,11 @@ class InvoiceService
             throw new \Exception('Fatura kalemi oluşturulamadı');
         }
 
+        // Ensure we return the correct type
+        if (!($item instanceof InvoiceItem)) {
+            throw new \Exception('Fatura kalemi oluşturulamadı - yanlış veri tipi');
+        }
+
         return $item;
     }
 
@@ -164,6 +174,11 @@ class InvoiceService
         
         if (!$updatedInvoice) {
             throw new \Exception('Fatura güncellenemedi');
+        }
+
+        // Ensure we return the correct type
+        if (!($updatedInvoice instanceof Invoice)) {
+            throw new \Exception('Fatura güncellenemedi - yanlış veri tipi');
         }
 
         return $updatedInvoice;
@@ -246,6 +261,11 @@ class InvoiceService
 
         if (!$payment) {
             throw new \Exception('Ödeme oluşturulamadı');
+        }
+
+        // Ensure we return the correct type
+        if (!($payment instanceof InvoicePayment)) {
+            throw new \Exception('Ödeme oluşturulamadı - yanlış veri tipi');
         }
 
         // Fatura durumunu güncelle
@@ -349,6 +369,11 @@ class InvoiceService
         
         if (!$updatedInvoice) {
             throw new \Exception('Fatura durumu güncellenemedi');
+        }
+
+        // Ensure we return the correct type
+        if (!($updatedInvoice instanceof Invoice)) {
+            throw new \Exception('Fatura durumu güncellenemedi - yanlış veri tipi');
         }
 
         return $updatedInvoice;
