@@ -21,6 +21,23 @@ class ProfileController extends Controller
             'email' => $user->email,
             'title' => $user->title ?? null,
             'avatarUrl' => $user->avatar_url ?? null,
+            'settings' => [
+                'notifications' => [
+                    'emailNotifications' => $user->email_notifications ?? true,
+                    'pushNotifications' => $user->push_notifications ?? true,
+                    'caseUpdates' => $user->case_updates ?? true,
+                    'taskReminders' => $user->task_reminders ?? true,
+                ],
+                'appearance' => [
+                    'theme' => $user->theme ?? 'light',
+                    'language' => $user->language ?? 'tr',
+                    'timezone' => $user->timezone ?? 'Europe/Istanbul',
+                ],
+                'privacy' => [
+                    'showProfileToOthers' => $user->show_profile ?? true,
+                    'showOnlineStatus' => $user->show_online_status ?? true,
+                ],
+            ]
         ]);
     }
 
