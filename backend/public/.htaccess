@@ -1,5 +1,5 @@
-# Apache configuration for BGAofis Law Office Automation Backend
-# This file ensures all requests are properly routed to index.php
+# Public directory .htaccess for BGAofis API
+# Updated: 2025-11-20 09:42:16
 
 # Enable rewrite engine
 RewriteEngine On
@@ -25,13 +25,10 @@ RewriteRule ^api/(.*)$ index.php [QSA,L]
 # Set proper headers for API responses
 <IfModule mod_headers.c>
     Header always set Access-Control-Allow-Origin "*"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, X-File-Name, Cache-Control"
     Header always set Access-Control-Allow-Credentials "true"
-    
-    # Handle preflight requests
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    Header always set Access-Control-Max-Age "86400"
 </IfModule>
 
 # PHP configuration for production
@@ -64,7 +61,7 @@ RewriteRule ^api/(.*)$ index.php [QSA,L]
     Deny from all
 </FilesMatch>
 
-# Set proper MIME types and handle static files
+# Set proper MIME types
 <IfModule mod_mime.c>
     AddType application/json .json
     AddType text/css .css
@@ -75,15 +72,4 @@ RewriteRule ^api/(.*)$ index.php [QSA,L]
     AddType image/jpeg .jpg .jpeg
     AddType image/gif .gif
     AddType image/x-icon .ico
-</IfModule>
-
-# Handle static assets properly
-<IfModule mod_rewrite.c>
-    # Don't rewrite requests for existing files
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Skip rewrite for static assets with proper extensions
-    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$ [NC]
-    RewriteRule .* - [L]
 </IfModule>

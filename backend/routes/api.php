@@ -124,6 +124,8 @@ return function (App $app) {
             $protected->group('/arbitration', function (Group $arbitration) {
                 $arbitration->get('', [ArbitrationController::class, 'index']);
                 $arbitration->post('', [ArbitrationController::class, 'store']);
+                // Static routes must come before parameterized routes
+                $arbitration->get('/statistics', [ArbitrationController::class, 'getStatistics']);
                 $arbitration->get('/{id}', [ArbitrationController::class, 'show']);
                 $arbitration->put('/{id}', [ArbitrationController::class, 'update']);
                 $arbitration->delete('/{id}', [ArbitrationController::class, 'destroy']);
@@ -132,7 +134,6 @@ return function (App $app) {
                 $arbitration->post('/{id}/documents', [ArbitrationController::class, 'uploadDocument']);
                 $arbitration->get('/{id}/documents', [ArbitrationController::class, 'getDocuments']);
                 $arbitration->get('/{id}/timeline', [ArbitrationController::class, 'getTimeline']);
-                $arbitration->get('/statistics', [ArbitrationController::class, 'getStatistics']);
             })->add(new AuditLogMiddleware('arbitration'));
 
         })->add(new AuthMiddleware());
