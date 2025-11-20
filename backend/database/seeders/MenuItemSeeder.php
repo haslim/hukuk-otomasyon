@@ -13,7 +13,8 @@ class MenuItemSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
+        // Use Eloquent capsule transaction instead of Laravel DB facade
+        \Illuminate\Database\Capsule\Manager::transaction(function () {
             // Ana menü öğelerini oluştur
             $menuItems = [
                 ['path' => '/', 'label' => 'Dashboard', 'icon' => 'dashboard', 'sort_order' => 1, 'parent_id' => null],

@@ -15,12 +15,22 @@ class ProfileController extends Controller
             return $this->json($response, ['message' => 'Unauthorized'], 401);
         }
 
+        // Load user with roles to include in response
+        $user->load('roles');
+        
         return $this->json($response, [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
             'title' => $user->title ?? null,
             'avatarUrl' => $user->avatar_url ?? null,
+            'roles' => $user->roles->map(function($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'key' => $role->key
+                ];
+            })->toArray(),
             'settings' => [
                 'notifications' => [
                     'emailNotifications' => $user->email_notifications ?? true,

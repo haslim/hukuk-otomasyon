@@ -127,9 +127,23 @@ export const MenuManagementPage: React.FC = () => {
   };
 
   // Sadece admin kullanıcılarının erişebilmesi için kontrol
-  const isAdmin = user?.roles?.some((role: any) => 
-    typeof role === 'string' ? role === 'administrator' : role?.key === 'administrator'
-  );
+  const isAdmin = user?.roles?.some((role: any) => {
+    if (typeof role === 'string') {
+      return role === 'administrator';
+    }
+    return role?.key === 'administrator';
+  });
+  
+  // Add debugging information
+  const debugInfo = {
+    hasUser: !!user,
+    userId: user?.id,
+    userEmail: user?.email,
+    hasRoles: !!user?.roles,
+    rolesCount: user?.roles?.length || 0,
+    roles: user?.roles,
+    isAdmin
+  };
   
   if (!isAdmin) {
     return (
@@ -137,7 +151,12 @@ export const MenuManagementPage: React.FC = () => {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h2 className="text-red-800 font-semibold mb-2">Erişim Engellendi</h2>
           <p className="text-red-600">Bu sayfaya sadece administrator rolüne sahip kullanıcılar erişebilir.</p>
-          <p className="text-red-600 text-sm mt-2">Mevcut rol: {JSON.stringify(user?.roles)}</p>
+          <details className="mt-4">
+            <summary className="text-red-600 text-sm cursor-pointer">Debug Bilgisi</summary>
+            <pre className="text-xs text-red-500 mt-2 bg-red-100 p-2 rounded overflow-auto">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </details>
         </div>
       </div>
     );

@@ -8,6 +8,12 @@ use Database\Seeders\MenuItemSeeder;
 echo "Updating menu structure for mediation grouping...\n";
 
 try {
+    // Ensure database connection is working
+    if (!DB::connection()->getPdo()) {
+        throw new Exception("Database connection failed");
+    }
+    echo "✓ Database connection verified\n";
+
     // Run the migration for menu hierarchy
     echo "Running menu hierarchy migration...\n";
     $migration = new class {
