@@ -20,6 +20,8 @@ export interface MenuPermission {
   icon: string;
   sortOrder: number;
   isVisible: boolean;
+  parentId?: string;
+  children?: MenuPermission[];
 }
 
 export interface RoleMenuPermission {
